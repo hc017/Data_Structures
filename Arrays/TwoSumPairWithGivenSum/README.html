@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Two Sum - Pair With Given Sum</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    padding-left: 18px;
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: 'Cascadia Code', Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Two Sum &mdash; Pair With Given Sum</h1>
+    <p class="tag">Day 1 &middot; Topic: Arrays &middot; Daily DSA Challenge</p>
+    <div class="badges">
+      <span class="badge">Difficulty: Easy</span>
+      <span class="badge">Pattern: Hashing</span>
+      <span class="badge">Time: O(n)</span>
+      <span class="badge">Space: O(n)</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2><span class="emoji">🧩</span> The Problem</h2>
+      <p>
+        You're given an array of integers <code>nums</code> and a target value <code>target</code>.
+        Find the indices of the two numbers that add up exactly to <code>target</code>.
+      </p>
+      <pre>Input:  nums = [2, 7, 11, 15, 1, 9], target = 9
+Output: [0, 1]   // because nums[0] + nums[1] = 2 + 7 = 9</pre>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📖</span> The Story</h2>
+      <p class="story">
+        Imagine you're at a coffee shop with exactly <b>&#8377;90</b> in your wallet, split across a few
+        loose notes on the table. You want to pick <i>two</i> notes that together add up to exactly &#8377;90
+        so you can pay without needing change.<br><br>
+        The slow way: pick up any note, then check it against every other note on the table one by one.
+        That's a lot of comparisons if there are many notes.<br><br>
+        The smart way: as you look at each note, keep a mental note ("I've seen a &#8377;20 and a &#8377;50 so far").
+        For the note in your hand right now, just ask &mdash; <b>"do I already remember seeing (90 minus this note's value)?"</b>
+        If yes, you found your pair instantly. If no, remember this note and move to the next one.
+      </p>
+      <p>
+        That "mental note" is exactly what a <b>HashMap</b> (Java) / <b>dict</b> (Python) does in this
+        solution &mdash; it remembers numbers you've already passed, so you never have to look back and re-scan.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🌍</span> Real-Life Example</h2>
+      <p>
+        Think of a <b>ride-share carpool matching app</b>. Each rider has a "budget gap" they're willing
+        to fill. The app wants to instantly pair two riders whose gaps add up to a shared trip's cost,
+        without re-checking every single rider against every other rider each time someone new joins.
+        Instead, it keeps a running lookup of gaps already seen, so a match is found the moment the
+        right complement shows up &mdash; same trick as this problem.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🔀</span> Logic Flow Chart</h2>
+      <div class="flow-wrap">
+        <svg viewBox="0 0 640 720" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto;">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .lbl { fill:#e2e8f0; font-family: 'Segoe UI', sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x="200" y="10" width="240" height="50" class="box"/>
+          <text x="320" y="40" class="lbl">Start: nums, target</text>
+          <line x1="320" y1="60" x2="320" y2="95" class="edge"/>
+
+          <rect x="180" y="95" width="280" height="50" class="box"/>
+          <text x="320" y="125" class="lbl">Create empty map "seen"</text>
+          <line x1="320" y1="145" x2="320" y2="180" class="edge"/>
+
+          <rect x="180" y="180" width="280" height="50" class="box"/>
+          <text x="320" y="210" class="lbl">Take next number in nums</text>
+          <line x1="320" y1="230" x2="320" y2="265" class="edge"/>
+
+          <rect x="150" y="265" width="340" height="55" class="box"/>
+          <text x="320" y="297" class="lbl">complement = target - number</text>
+          <line x1="320" y1="320" x2="320" y2="360" class="edge"/>
+
+          <polygon points="320,360 460,420 320,480 180,420" class="decision"/>
+          <text x="320" y="416" class="lbl">Is complement</text>
+          <text x="320" y="434" class="lbl">already in "seen"?</text>
+
+          <line x1="460" y1="420" x2="560" y2="420" class="edge"/>
+          <text x="510" y="410" class="lbl small">Yes</text>
+          <rect x="480" y="440" width="150" height="60" class="box"/>
+          <text x="555" y="465" class="lbl">Return indices</text>
+          <text x="555" y="483" class="lbl">[seen[complement], i]</text>
+
+          <line x1="320" y1="480" x2="320" y2="520" class="edge"/>
+          <text x="335" y="505" class="lbl small">No</text>
+          <rect x="180" y="520" width="280" height="55" class="box"/>
+          <text x="320" y="552" class="lbl">Store number → index in "seen"</text>
+          <line x1="320" y1="575" x2="320" y2="605" class="edge"/>
+
+          <polygon points="320,605 440,650 320,695 200,650" class="decision"/>
+          <text x="320" y="646" class="lbl">More numbers</text>
+          <text x="320" y="664" class="lbl">left?</text>
+
+          <line x1="200" y1="650" x2="120" y2="650" class="edge"/>
+          <line x1="120" y1="650" x2="120" y2="205" class="edge"/>
+          <line x1="120" y1="205" x2="178" y2="205" class="edge"/>
+          <text x="120" y="640" class="lbl small">Yes → loop</text>
+
+          <line x1="320" y1="695" x2="320" y2="715" class="edge"/>
+          <text x="345" y="710" class="lbl small">No</text>
+        </svg>
+      </div>
+      <p style="color:var(--muted); font-size:0.85rem; text-align:center;">
+        Left branch loops back to "take next number" until either a match is found or the array is exhausted.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">⚙️</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force</td><td>O(n²)</td><td>O(1)</td><td>Check every pair (i, j)</td></tr>
+        <tr><td>HashMap (Optimized)</td><td>O(n)</td><td>O(n)</td><td>Remember seen numbers, look up the complement</td></tr>
+      </table>
+      <div class="complexity" style="margin-top:16px;">
+        <div class="pill"><h3>Why HashMap wins</h3><p>One pass through the array instead of nested loops &mdash; each lookup is O(1) on average.</p></div>
+        <div class="pill"><h3>Trade-off</h3><p>Uses extra memory to store seen numbers, trading space for speed.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📂</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + optimized)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + optimized)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 1 &middot; Arrays &middot; Generated 2026-07-08
+  </footer>
+
+</body>
+</html>
