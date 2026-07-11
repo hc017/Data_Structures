@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Maximum Subarray Sum (Kadane's Algorithm)</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    padding-left: 18px;
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: 'Cascadia Code', Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Maximum Subarray Sum &mdash; Kadane's Algorithm</h1>
+    <p class="tag">Day 2 &middot; Topic: Arrays &middot; Daily DSA Challenge</p>
+    <div class="badges">
+      <span class="badge">Difficulty: Medium</span>
+      <span class="badge">Pattern: Kadane's Algorithm / DP</span>
+      <span class="badge">Time: O(n)</span>
+      <span class="badge">Space: O(1)</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2><span class="emoji">🧩</span> The Problem</h2>
+      <p>
+        You're given an array of integers <code>nums</code> that can include negative numbers.
+        Find the contiguous subarray (at least one number) that has the largest sum, and return that sum.
+      </p>
+      <pre>Input:  nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+Output: 6   // because [4, -1, 2, 1] has the largest sum = 6</pre>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📖</span> The Story</h2>
+      <p class="story">
+        Imagine you're tracking your daily profit/loss for a small stall over a few weeks &mdash;
+        some days you gain money, some days you lose money. You want to find the best possible
+        <i>run</i> of consecutive days that gave you the highest total profit.<br><br>
+        The slow way: for every possible start day, add up every possible end day and compare.
+        That means re-adding the same days again and again.<br><br>
+        The smart way: walk through the days once, keeping a "current streak total" in your head.
+        After each day, ask yourself &mdash; <b>"is my current streak still worth continuing, or would I be
+        better off starting a brand new streak from today?"</b> If the streak so far has dragged you
+        below zero, drop it and start fresh from today. Otherwise, keep riding it. All the while,
+        remember the best streak total you've ever seen.
+      </p>
+      <p>
+        That "should I continue or restart" decision, made once per day, is exactly what
+        <b>Kadane's Algorithm</b> does &mdash; no re-scanning, no nested loops, just one pass.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🌍</span> Real-Life Example</h2>
+      <p>
+        Think of a <b>stock trading dashboard</b> that highlights the best-performing consecutive
+        trading window for a stock's daily gains/losses. Instead of comparing every possible date
+        range against every other (painfully slow for years of data), the dashboard scans day by day,
+        carrying forward a running streak and resetting it the moment it turns into a drag &mdash;
+        instantly surfacing the best window as it goes. Same core idea powers GPS apps finding the
+        "best stretch" of a route and fitness apps finding your best rolling-average pace.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🔀</span> Logic Flow Chart</h2>
+      <div class="flow-wrap">
+        <svg viewBox="0 0 640 760" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto;">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .lbl { fill:#e2e8f0; font-family: 'Segoe UI', sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x="190" y="10" width="260" height="50" class="box"/>
+          <text x="320" y="40" class="lbl">Start: nums</text>
+          <line x1="320" y1="60" x2="320" y2="95" class="edge"/>
+
+          <rect x="140" y="95" width="360" height="55" class="box"/>
+          <text x="320" y="127" class="lbl">currentSum = bestSum = nums[0]</text>
+          <line x1="320" y1="150" x2="320" y2="185" class="edge"/>
+
+          <rect x="150" y="185" width="340" height="50" class="box"/>
+          <text x="320" y="215" class="lbl">Take next number (i = 1..n-1)</text>
+          <line x1="320" y1="235" x2="320" y2="270" class="edge"/>
+
+          <polygon points="320,270 470,335 320,400 170,335" class="decision"/>
+          <text x="320" y="325" class="lbl">currentSum + num</text>
+          <text x="320" y="343" class="lbl">&gt; num ?</text>
+
+          <line x1="470" y1="335" x2="560" y2="335" class="edge"/>
+          <text x="518" y="325" class="lbl small">Yes</text>
+          <rect x="480" y="360" width="150" height="55" class="box"/>
+          <text x="555" y="384" class="lbl">Extend streak:</text>
+          <text x="555" y="402" class="lbl">currentSum += num</text>
+
+          <line x1="170" y1="335" x2="80" y2="335" class="edge"/>
+          <text x="120" y="325" class="lbl small">No</text>
+          <rect x="0" y="360" width="150" height="55" class="box"/>
+          <text x="75" y="384" class="lbl">Restart streak:</text>
+          <text x="75" y="402" class="lbl">currentSum = num</text>
+
+          <line x1="555" y1="415" x2="555" y2="450" class="edge"/>
+          <line x1="75" y1="415" x2="75" y2="450" class="edge"/>
+          <line x1="75" y1="450" x2="320" y2="450" class="edge"/>
+          <line x1="555" y1="450" x2="320" y2="450" class="edge"/>
+          <line x1="320" y1="450" x2="320" y2="470" class="edge"/>
+
+          <rect x="150" y="470" width="340" height="55" class="box"/>
+          <text x="320" y="502" class="lbl">bestSum = max(bestSum, currentSum)</text>
+          <line x1="320" y1="525" x2="320" y2="560" class="edge"/>
+
+          <polygon points="320,560 450,610 320,660 190,610" class="decision"/>
+          <text x="320" y="606" class="lbl">More numbers</text>
+          <text x="320" y="624" class="lbl">left?</text>
+
+          <line x1="190" y1="610" x2="100" y2="610" class="edge"/>
+          <line x1="100" y1="610" x2="100" y2="210" class="edge"/>
+          <line x1="100" y1="210" x2="148" y2="210" class="edge"/>
+          <text x="100" y="600" class="lbl small">Yes → loop</text>
+
+          <line x1="320" y1="660" x2="320" y2="695" class="edge"/>
+          <text x="345" y="685" class="lbl small">No</text>
+          <rect x="200" y="695" width="240" height="50" class="box"/>
+          <text x="320" y="725" class="lbl">Return bestSum</text>
+        </svg>
+      </div>
+      <p style="color:var(--muted); font-size:0.85rem; text-align:center;">
+        Left branch loops back to "take next number" until every element has been visited.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">⚙️</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force</td><td>O(n²)</td><td>O(1)</td><td>Sum every possible subarray (i, j)</td></tr>
+        <tr><td>Kadane's Algorithm (Optimized)</td><td>O(n)</td><td>O(1)</td><td>Track a running streak; drop it and restart the moment it turns negative</td></tr>
+      </table>
+      <div class="complexity" style="margin-top:16px;">
+        <div class="pill"><h3>Why Kadane's wins</h3><p>Single pass through the array &mdash; each element is visited once, with only constant extra work.</p></div>
+        <div class="pill"><h3>Trade-off</h3><p>None really &mdash; it's both faster and uses less memory than brute force, making it the clear choice here.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📂</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + optimized)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + optimized)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 2 &middot; Arrays &middot; Generated 2026-07-11
+  </footer>
+
+</body>
+</html>
