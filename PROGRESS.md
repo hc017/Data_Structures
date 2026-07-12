@@ -6,6 +6,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 |-----|------------|--------|----------------------------------|-----------------------------------------|
 | 1   | 2026-07-08 | Arrays | Two Sum - Pair With Given Sum    | `Arrays/TwoSumPairWithGivenSum`         |
 | 2   | 2026-07-11 | Arrays | Maximum Subarray Sum (Kadane's Algorithm) | `Arrays/MaximumSubarraySum`   |
+| 3   | 2026-07-12 | Two Pointers | Container With Most Water | `TwoPointers/ContainerWithMostWater`    |
 
 ## Versioning
 

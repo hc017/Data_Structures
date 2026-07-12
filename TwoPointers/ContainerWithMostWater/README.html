@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Container With Most Water</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    padding-left: 18px;
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: 'Cascadia Code', Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Container With Most Water</h1>
+    <p class="tag">Day 3 &middot; Topic: Two Pointers &middot; Daily DSA Challenge</p>
+    <div class="badges">
+      <span class="badge">Difficulty: Medium</span>
+      <span class="badge">Pattern: Two Pointers</span>
+      <span class="badge">Time: O(n)</span>
+      <span class="badge">Space: O(1)</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2><span class="emoji">🧩</span> The Problem</h2>
+      <p>
+        You're given an array <code>height</code> where <code>height[i]</code> is the height of a
+        vertical line at position <code>i</code>. Pick two lines that, together with the x-axis,
+        form a container holding the most water.
+      </p>
+      <pre>Input:  height = [1, 8, 6, 2, 5, 4, 8, 3, 7]
+Output: 49   // lines at index 1 (height 8) and index 8 (height 7): min(8,7) * (8-1) = 49</pre>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📖</span> The Story</h2>
+      <p class="story">
+        Picture a row of buckets of different heights lined up on a table, and you're holding a
+        giant sheet of plastic. You stretch the sheet between any two buckets to make a pool of
+        water between them. The pool's water level can only ever reach the height of the
+        <b>shorter</b> bucket &mdash; any higher and it just spills over that side.<br><br>
+        The slow way: try every possible pair of buckets, measure the pool each time, and remember
+        the biggest one. With a lot of buckets, that's a huge number of pairs to check.<br><br>
+        The smart way: start with the two buckets at the very ends of the table &mdash; that gives you
+        the widest possible pool to begin with. Now look at which of the two end buckets is shorter.
+        That short one is the reason your pool is limited, so step it inward one bucket at a time,
+        hoping to find a taller one. The taller bucket stays put, because moving it inward can only
+        shrink your width without raising the water level (still capped by the short side). Keep
+        stepping the shorter side inward, checking the pool size each time, until both hands meet
+        in the middle.
+      </p>
+      <p>
+        That's exactly the <b>two-pointer</b> trick &mdash; one pointer at each end, always sliding the
+        pointer at the shorter wall, because that's the only move that could possibly improve things.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🌍</span> Real-Life Example</h2>
+      <p>
+        Think of setting up a <b>volleyball net between two poles</b> planted at different spots
+        along a beach, where each pole has a different height. The net can only be pulled as high
+        as the <b>shorter</b> pole allows, and the area it covers depends on both the height and the
+        distance between the poles. If you want to maximize the shaded area under the net, you'd
+        naturally start with the two poles furthest apart, then only bother moving the shorter one
+        closer, since the taller pole was never your limiting factor in the first place.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🔀</span> Logic Flow Chart</h2>
+      <div class="flow-wrap">
+        <svg viewBox="0 0 640 760" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto;">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .lbl { fill:#e2e8f0; font-family: 'Segoe UI', sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x="190" y="10" width="260" height="50" class="box"/>
+          <text x="320" y="40" class="lbl">Start: height[] array</text>
+          <line x1="320" y1="60" x2="320" y2="95" class="edge"/>
+
+          <rect x="170" y="95" width="300" height="50" class="box"/>
+          <text x="320" y="125" class="lbl">left = 0, right = n - 1, best = 0</text>
+          <line x1="320" y1="145" x2="320" y2="180" class="edge"/>
+
+          <polygon points="320,180 440,225 320,270 200,225" class="decision"/>
+          <text x="320" y="221" class="lbl">left &lt; right?</text>
+
+          <line x1="320" y1="270" x2="320" y2="305" class="edge"/>
+          <text x="345" y="295" class="lbl small">Yes</text>
+
+          <rect x="150" y="305" width="340" height="55" class="box"/>
+          <text x="320" y="330" class="lbl">area = min(height[left], height[right])</text>
+          <text x="320" y="350" class="lbl">* (right - left)</text>
+          <line x1="320" y1="360" x2="320" y2="395" class="edge"/>
+
+          <rect x="180" y="395" width="280" height="50" class="box"/>
+          <text x="320" y="425" class="lbl">best = max(best, area)</text>
+          <line x1="320" y1="445" x2="320" y2="480" class="edge"/>
+
+          <polygon points="320,480 460,535 320,590 180,535" class="decision"/>
+          <text x="320" y="531" class="lbl">height[left] &lt;</text>
+          <text x="320" y="549" class="lbl">height[right]?</text>
+
+          <line x1="180" y1="535" x2="90" y2="535" class="edge"/>
+          <text x="130" y="525" class="lbl small">Yes</text>
+          <rect x="10" y="510" width="150" height="50" class="box"/>
+          <text x="85" y="540" class="lbl">left++</text>
+
+          <line x1="460" y1="535" x2="550" y2="535" class="edge"/>
+          <text x="510" y="525" class="lbl small">No</text>
+          <rect x="480" y="510" width="150" height="50" class="box"/>
+          <text x="555" y="540" class="lbl">right--</text>
+
+          <line x1="85" y1="510" x2="85" y2="225" class="edge"/>
+          <line x1="85" y1="225" x2="198" y2="225" class="edge"/>
+          <line x1="555" y1="510" x2="555" y2="225" class="edge"/>
+          <line x1="555" y1="225" x2="442" y2="225" class="edge"/>
+          <text x="85" y="270" class="lbl small">loop back</text>
+
+          <line x1="320" y1="180" x2="320" y2="180" class="edge"/>
+          <line x1="200" y1="225" x2="120" y2="680" class="edge" style="display:none;"/>
+
+          <rect x="230" y="680" width="180" height="50" class="box"/>
+          <text x="320" y="710" class="lbl">Return best</text>
+          <line x1="200" y1="225" x2="120" y2="225" class="edge" style="display:none;"/>
+          <line x1="200" y1="225" x2="130" y2="680" class="edge" style="display:none;"/>
+          <path d="M200,225 C 60,225 60,700 228,700" class="edge" style="display:none;"/>
+          <line x1="200" y1="225" x2="230" y2="705" class="edge" style="display:none;"/>
+          <text x="430" y="660" class="lbl small">No (left == right)</text>
+          <path d="M200,225 L 60,225 L 60,705 L 228,705" class="edge"/>
+        </svg>
+      </div>
+      <p style="color:var(--muted); font-size:0.85rem; text-align:center;">
+        The pointers march toward each other, always shrinking the shorter wall's side, until they meet.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">⚙️</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force</td><td>O(n&sup2;)</td><td>O(1)</td><td>Check every pair (i, j) and track the best area</td></tr>
+        <tr><td>Two Pointers (Optimized)</td><td>O(n)</td><td>O(1)</td><td>Start at both ends, always move the shorter wall inward</td></tr>
+      </table>
+      <div class="complexity" style="margin-top:16px;">
+        <div class="pill"><h3>Why Two Pointers wins</h3><p>Single pass across the array &mdash; each pointer moves at most n times total, no nested loop needed.</p></div>
+        <div class="pill"><h3>Trade-off</h3><p>Relies on the greedy insight that moving the taller wall can never help &mdash; worth proving to yourself once.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📂</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + optimized)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + optimized)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 3 &middot; Two Pointers &middot; Generated 2026-07-12
+  </footer>
+
+</body>
+</html>
