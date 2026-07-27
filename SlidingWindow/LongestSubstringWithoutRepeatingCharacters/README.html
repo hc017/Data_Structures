@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Longest Substring Without Repeating Characters</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    padding-left: 18px;
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: 'Cascadia Code', Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Longest Substring Without Repeating Characters</h1>
+    <p class="tag">Day 4 &middot; Topic: Sliding Window &middot; Daily DSA Challenge</p>
+    <div class="badges">
+      <span class="badge">Difficulty: Medium</span>
+      <span class="badge">Pattern: Sliding Window</span>
+      <span class="badge">Time: O(n)</span>
+      <span class="badge">Space: O(min(n, charset))</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2><span class="emoji">🧩</span> The Problem</h2>
+      <p>
+        You're given a string <code>s</code>. Find the length of the longest substring
+        that does not contain any repeating characters.
+      </p>
+      <pre>Input:  s = "abcabcbb"
+Output: 3   // the longest repeat-free substring is "abc"</pre>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📖</span> The Story</h2>
+      <p class="story">
+        Imagine you're a bouncer at the door of a small party room. Guests walk in one
+        at a time, but the room has one strict rule: <b>no two guests with the same name
+        can be inside at once</b>.<br><br>
+        The slow way: every time someone new arrives, check their name against every single
+        guest already inside, one by one. With a big room that's a lot of checking.<br><br>
+        The smart way: keep a sticky note of "who's currently inside and where they're
+        standing." When a new guest arrives, glance at the note. If their name is already
+        on it <i>and that person is still in the room</i>, walk to the door and start
+        letting people out from the front of the line until that duplicate guest has left
+        &mdash; then let the new guest in. If their name isn't in the room, just let them in
+        and keep growing the room.<br><br>
+        The "room" is your sliding window (<code>left</code> to <code>right</code>), and the
+        sticky note is a HashMap (Java) / dict (Python) that remembers the last position each
+        character was seen.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🌍</span> Real-Life Example</h2>
+      <p>
+        Think of a <b>music streaming app's "no repeat" queue rule</b> &mdash; it won't play
+        the same song twice within your current listening session's recent window. As new
+        songs are queued, the app checks if a track is already "active" in the recent
+        window; if so, it trims older tracks off the front of the window until the repeat
+        is gone, then keeps playing. It never re-scans the whole history &mdash; it just
+        remembers the last time each song played and slides the window forward.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">🔀</span> Logic Flow Chart</h2>
+      <div class="flow-wrap">
+        <svg viewBox="0 0 640 830" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto;">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .lbl { fill:#e2e8f0; font-family: 'Segoe UI', sans-serif; font-size:14px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x="190" y="10" width="260" height="50" class="box"/>
+          <text x="320" y="40" class="lbl">Start: s, left=0, maxLen=0</text>
+          <line x1="320" y1="60" x2="320" y2="95" class="edge"/>
+
+          <rect x="180" y="95" width="280" height="50" class="box"/>
+          <text x="320" y="125" class="lbl">Create empty map "lastSeen"</text>
+          <line x1="320" y1="145" x2="320" y2="180" class="edge"/>
+
+          <rect x="180" y="180" width="280" height="50" class="box"/>
+          <text x="320" y="210" class="lbl">Take char at "right" pointer</text>
+          <line x1="320" y1="230" x2="320" y2="265" class="edge"/>
+
+          <polygon points="320,265 460,350 320,435 180,350" class="decision"/>
+          <text x="320" y="345" class="lbl">Is char already inside</text>
+          <text x="320" y="363" class="lbl">current window?</text>
+
+          <line x1="460" y1="350" x2="560" y2="350" class="edge"/>
+          <text x="510" y="340" class="lbl small">Yes</text>
+          <rect x="480" y="380" width="160" height="60" class="box"/>
+          <text x="560" y="405" class="lbl">left =</text>
+          <text x="560" y="423" class="lbl">lastSeen[char] + 1</text>
+
+          <line x1="560" y1="440" x2="560" y2="485" class="edge"/>
+          <line x1="560" y1="485" x2="460" y2="485" class="edge"/>
+
+          <line x1="320" y1="435" x2="320" y2="460" class="edge"/>
+          <text x="345" y="452" class="lbl small">No</text>
+
+          <rect x="180" y="460" width="280" height="50" class="box"/>
+          <text x="320" y="490" class="lbl">Update lastSeen[char] = right</text>
+          <line x1="320" y1="510" x2="320" y2="545" class="edge"/>
+
+          <rect x="150" y="545" width="340" height="55" class="box"/>
+          <text x="320" y="577" class="lbl">maxLen = max(maxLen, right-left+1)</text>
+          <line x1="320" y1="600" x2="320" y2="635" class="edge"/>
+
+          <polygon points="320,635 440,680 320,725 200,680" class="decision"/>
+          <text x="320" y="676" class="lbl">More chars left?</text>
+          <text x="320" y="694" class="lbl">(right++)</text>
+
+          <line x1="200" y1="680" x2="100" y2="680" class="edge"/>
+          <line x1="100" y1="680" x2="100" y2="205" class="edge"/>
+          <line x1="100" y1="205" x2="178" y2="205" class="edge"/>
+          <text x="100" y="670" class="lbl small">Yes → loop</text>
+
+          <line x1="320" y1="725" x2="320" y2="760" class="edge"/>
+          <text x="345" y="748" class="lbl small">No</text>
+
+          <rect x="240" y="760" width="160" height="50" class="box"/>
+          <text x="320" y="790" class="lbl">Return maxLen</text>
+        </svg>
+      </div>
+      <p style="color:var(--muted); font-size:0.85rem; text-align:center;">
+        The "Yes" branch on the right shrinks the window by advancing <code>left</code>
+        past the duplicate's last seen position before the window is updated and re-measured.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">⚙️</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force</td><td>O(n&sup3;)</td><td>O(min(n, charset))</td><td>Check every substring, verify all characters are unique</td></tr>
+        <tr><td>Sliding Window (Optimized)</td><td>O(n)</td><td>O(min(n, charset))</td><td>Expand right, shrink left past duplicates, track max window size</td></tr>
+      </table>
+      <div class="complexity" style="margin-top:16px;">
+        <div class="pill"><h3>Why sliding window wins</h3><p>Each character is added and removed from the window at most once, so the whole string is scanned in one pass.</p></div>
+        <div class="pill"><h3>Trade-off</h3><p>Needs a small lookup table to remember where each character was last seen &mdash; a modest space cost for a big time win.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="emoji">📂</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + optimized)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + optimized)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 4 &middot; Sliding Window &middot; Generated 2026-07-27
+  </footer>
+
+</body>
+</html>
