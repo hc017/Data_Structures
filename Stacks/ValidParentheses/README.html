@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<title>Valid Parentheses - Stacks</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+    --bad: #fb7185;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: Cascadia Code, Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  .note { color: var(--muted); font-size: 0.85rem; text-align: center; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class='hero'>
+    <h1>Valid Parentheses</h1>
+    <p class='tag'>Day 6 &middot; Topic: Stacks &middot; Daily DSA Challenge</p>
+    <div class='badges'>
+      <span class='badge'>Difficulty: Easy</span>
+      <span class='badge'>Pattern: Stack / LIFO Matching</span>
+      <span class='badge'>Time: O(n)</span>
+      <span class='badge'>Space: O(n)</span>
+    </div>
+  </div>
+
+  <div class='container'>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#129513;</span> The Problem</h2>
+      <p>
+        You are given a string <code>s</code> made only of the characters
+        <code>(</code> <code>)</code> <code>{</code> <code>}</code> <code>[</code> <code>]</code>.
+        Decide whether the brackets are <b>balanced</b>: every opening bracket must be closed
+        by the <i>same type</i> of bracket, and they must close in the <i>correct order</i>.
+      </p>
+      <pre>Input:  s = {[()()]()}
+Output: true      // every bracket closes with its own partner, in order
+
+Input:  s = ([)]
+Output: false     // the ) tries to close a [ - wrong type, wrong order
+
+Input:  s = (((
+Output: false     // three brackets opened, none ever closed</pre>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128214;</span> The Story</h2>
+      <p class='story'>
+        Imagine you are stacking dinner plates while washing up. Each time you open a bracket,
+        you place a plate on the pile &mdash; a round plate for <code>(</code>, a square one for
+        <code>[</code>, a fancy one for <code>{</code>.<br><br>
+        Now someone hands you a <i>closing</i> bracket and says: put this one away.
+        Here is the catch &mdash; you can only ever touch the <b>plate on top of the pile</b>.
+        You cannot reach into the middle without the whole stack toppling.<br><br>
+        So when a <code>)</code> arrives, you look at the top plate. Is it round? Great &mdash;
+        lift it off, they cancel out. Is it square instead? Then something went wrong: you
+        opened a square bracket and are trying to close it with a round one. The string is invalid,
+        and you can stop right there.<br><br>
+        At the very end, the pile must be <b>empty</b>. If plates are still sitting there, you opened
+        brackets you never closed.
+      </p>
+      <p>
+        That plate pile is exactly a <b>Stack</b> &mdash; <code>ArrayDeque</code> in Java, a plain
+        <code>list</code> used with <code>append</code> and <code>pop</code> in Python. It is
+        <b>Last In, First Out</b>: the most recently opened bracket is always the first one
+        that must be closed.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#127757;</span> Real-Life Example</h2>
+      <p>
+        Every <b>code editor</b> you have ever used does this. When VS Code greys out a stray
+        <code>}</code> or highlights the matching bracket as your cursor moves, it is running this
+        exact algorithm over your file. So is every <b>compiler</b> before it will even attempt to
+        understand your program, and every <b>HTML/XML parser</b> checking that
+        <code>&lt;div&gt;</code> tags close in the right order.
+      </p>
+      <p>
+        A less obvious one: the <b>browser back button</b>. Pages you visit are pushed onto a stack,
+        and Back pops the most recent one. Same LIFO principle &mdash; the last thing you opened
+        is the first thing you leave.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128256;</span> Logic Flow Chart</h2>
+      <div class='flow-wrap'>
+        <svg viewBox='0 0 660 810' xmlns='http://www.w3.org/2000/svg' style='max-width:100%; height:auto;'>
+          <defs>
+            <marker id='arrow' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto' markerUnits='strokeWidth'>
+              <path d='M0,0 L0,6 L9,3 z' fill='#38bdf8'/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .fail { fill:#2a1020; stroke:#fb7185; stroke-width:2; rx:12; }
+            .pass { fill:#0d2a20; stroke:#34d399; stroke-width:2; rx:12; }
+            .lbl { fill:#e2e8f0; font-family: Segoe UI, sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x='215' y='10' width='230' height='46' class='box'/>
+          <text x='330' y='38' class='lbl'>Start: string s</text>
+          <line x1='330' y1='56' x2='330' y2='88' class='edge'/>
+
+          <rect x='195' y='88' width='270' height='46' class='box'/>
+          <text x='330' y='116' class='lbl'>Create empty stack</text>
+          <line x1='330' y1='134' x2='330' y2='166' class='edge'/>
+
+          <rect x='195' y='166' width='270' height='46' class='box'/>
+          <text x='330' y='194' class='lbl'>Take next character c</text>
+          <line x1='330' y1='212' x2='330' y2='246' class='edge'/>
+
+          <polygon points='330,246 470,296 330,346 190,296' class='decision'/>
+          <text x='330' y='292' class='lbl'>Is c an opening</text>
+          <text x='330' y='310' class='lbl'>bracket?</text>
+
+          <line x1='470' y1='296' x2='545' y2='296' class='edge'/>
+          <text x='508' y='288' class='lbl small'>Yes</text>
+          <rect x='500' y='318' width='150' height='46' class='box'/>
+          <text x='575' y='346' class='lbl'>Push c on stack</text>
+
+          <line x1='330' y1='346' x2='330' y2='382' class='edge'/>
+          <text x='355' y='370' class='lbl small'>No (closing)</text>
+
+          <polygon points='330,382 470,432 330,482 190,432' class='decision'/>
+          <text x='330' y='428' class='lbl'>Stack empty OR</text>
+          <text x='330' y='446' class='lbl'>top is wrong type?</text>
+
+          <line x1='190' y1='432' x2='115' y2='432' class='edge'/>
+          <text x='152' y='424' class='lbl small'>Yes</text>
+          <rect x='10' y='454' width='150' height='46' class='fail'/>
+          <text x='85' y='482' class='lbl'>Return FALSE</text>
+
+          <line x1='330' y1='482' x2='330' y2='516' class='edge'/>
+          <text x='346' y='505' class='lbl small'>No</text>
+          <rect x='195' y='516' width='270' height='46' class='box'/>
+          <text x='330' y='544' class='lbl'>Pop the matching bracket</text>
+          <line x1='330' y1='562' x2='330' y2='594' class='edge'/>
+
+          <polygon points='330,594 460,642 330,690 200,642' class='decision'/>
+          <text x='330' y='638' class='lbl'>More characters</text>
+          <text x='330' y='656' class='lbl'>left?</text>
+
+          <line x1='200' y1='642' x2='140' y2='642' class='edge'/>
+          <line x1='140' y1='642' x2='140' y2='189' class='edge'/>
+          <line x1='140' y1='189' x2='193' y2='189' class='edge'/>
+          <text x='142' y='632' class='lbl small'>Yes, loop</text>
+
+          <line x1='330' y1='690' x2='330' y2='722' class='edge'/>
+          <text x='346' y='712' class='lbl small'>No</text>
+
+          <polygon points='330,722 460,764 330,806 200,764' class='decision'/>
+          <text x='330' y='760' class='lbl'>Stack empty?</text>
+          <text x='330' y='780' class='lbl small'>yes = TRUE / no = FALSE</text>
+
+          <rect x='495' y='741' width='155' height='46' class='pass'/>
+          <text x='572' y='769' class='lbl'>Return result</text>
+          <line x1='460' y1='764' x2='491' y2='764' class='edge'/>
+        </svg>
+      </div>
+      <p class='note'>
+        The loop keeps consuming characters. Any mismatch exits early with FALSE, and a leftover
+        non-empty stack at the end also means FALSE.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#9881;</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force</td><td>O(n&sup2;)</td><td>O(n)</td><td>Repeatedly delete adjacent pairs <code>()</code> <code>[]</code> <code>{}</code> until nothing changes; valid if the string becomes empty</td></tr>
+        <tr><td>Stack (Optimized)</td><td>O(n)</td><td>O(n)</td><td>One pass: push opening brackets, and on a closing bracket check the top of the stack matches</td></tr>
+      </table>
+      <div class='complexity' style='margin-top:16px;'>
+        <div class='pill'><h3>Why the stack wins</h3><p>Each character is pushed and popped at most once, so a single left-to-right pass is enough. The brute force has to rescan the whole string after every deletion.</p></div>
+        <div class='pill'><h3>Trade-off</h3><p>Both use O(n) space in the worst case, so the stack is a straight upgrade here. It also fails fast, stopping the moment a mismatch is found.</p></div>
+      </div>
+      <p style='color:#94a3b8; font-size:0.88rem;'>
+        <b>Edge cases worth remembering:</b> the empty string is valid; an odd-length string can
+        never be valid; and a closing bracket arriving when the stack is empty is an immediate no.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128193;</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + stack)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + stack)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 6 &middot; Stacks &middot; Generated 2026-08-11
+  </footer>
+
+</body>
+</html>
