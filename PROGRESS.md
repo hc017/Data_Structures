@@ -9,6 +9,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 | 3   | 2026-07-12 | Two Pointers | Container With Most Water | `TwoPointers/ContainerWithMostWater`    |
 | 4   | 2026-07-27 | Sliding Window | Longest Substring Without Repeating Characters | `SlidingWindow/LongestSubstringWithoutRepeatingCharacters` |
 | 5   | 2026-07-30 | Hashing | Group Anagrams | `Hashing/GroupAnagrams` |
+| 6   | 2026-08-11 | Stacks | Valid Parentheses | `Stacks/ValidParentheses` |
 
 ## Versioning
 
