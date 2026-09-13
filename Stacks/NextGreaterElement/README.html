@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<title>Next Greater Element - Stacks</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+    --bad: #fb7185;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: Cascadia Code, Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  .note { color: var(--muted); font-size: 0.85rem; text-align: center; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class='hero'>
+    <h1>Next Greater Element</h1>
+    <p class='tag'>Day 7 &middot; Topic: Stacks &middot; Daily DSA Challenge</p>
+    <div class='badges'>
+      <span class='badge'>Difficulty: Medium</span>
+      <span class='badge'>Pattern: Monotonic Stack</span>
+      <span class='badge'>Time: O(n)</span>
+      <span class='badge'>Space: O(n)</span>
+    </div>
+  </div>
+
+  <div class='container'>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#129513;</span> The Problem</h2>
+      <p>
+        You are given an array <code>nums</code>. For <b>every</b> element, find the
+        <b>first</b> element to its <b>right</b> that is <b>strictly greater</b> than it.
+        If no such element exists, the answer for that position is <code>-1</code>.
+      </p>
+      <pre>Input:  nums = [4, 5, 2, 25]
+Output: [5, 25, 25, -1]
+        // 4  -> 5 is the first bigger value to its right
+        // 5  -> 2 is smaller, 25 is bigger  -> 25
+        // 2  -> 25
+        // 25 -> nothing to its right at all -> -1
+
+Input:  nums = [13, 7, 6, 12]
+Output: [-1, 12, 12, -1]
+
+Input:  nums = [4, 3, 2, 1]
+Output: [-1, -1, -1, -1]   // every value is bigger than everything after it</pre>
+      <p style='color:#94a3b8; font-size:0.9rem;'>
+        Note the word <i>strictly</i>: for <code>[2, 2, 2]</code> the answer is
+        <code>[-1, -1, -1]</code>, because an equal value does not count as greater.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128214;</span> The Story</h2>
+      <p class='story'>
+        Picture a row of people standing in a queue, all facing <b>forward</b> (to the right).
+        Each person wants to know one thing: <i>who is the first person ahead of me who is
+        taller than I am?</i> That is the only person who blocks their view.<br><br>
+        The lazy way is to ask each person to crane their neck and count heads one by one
+        until they spot someone taller. That works, but a queue sorted tallest-first means
+        everyone scans the entire line ahead of them. Enormous wasted effort.<br><br>
+        So instead, walk the queue <b>backwards</b>, from the very last person to the first,
+        carrying a small pile of notes &mdash; a <b>stack</b>. The pile holds the heights of
+        people who are still <i>visible</i> from further back.<br><br>
+        Now you reach a person of height <code>h</code>. Look at the top of the pile. Is that
+        person shorter than or the same as <code>h</code>? Then throw that note away &mdash;
+        forever. Nobody standing further back will ever see them, because this new person is
+        <b>closer</b> and <b>at least as tall</b>, so they block them completely. Keep throwing
+        away until the top of the pile is someone genuinely taller. <b>That is the answer.</b>
+        If the pile empties out, nobody ahead is taller, so the answer is <code>-1</code>.<br><br>
+        Finally, drop your own height on the pile, because you might be the blocker for
+        somebody behind you. Then step back one place and repeat.
+      </p>
+      <p>
+        The pile is never in a random order: it always decreases from bottom to top, because
+        anything smaller gets thrown away the moment a bigger value arrives. That is why this
+        pattern is called a <b>monotonic stack</b>.
+      </p>
+      <p>
+        The magic is in the accounting. The inner &ldquo;keep throwing away&rdquo; loop looks
+        like it could be expensive, but every height is written on the pile exactly <b>once</b>
+        and thrown away at most <b>once</b>. Two operations per element, total &mdash; so the
+        whole thing is O(n), not O(n&sup2;).
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#127757;</span> Real-Life Example</h2>
+      <p>
+        <b>Stock prices.</b> You hold a share and you want to know: after today, what is the
+        <i>next day</i> the price closes higher than today? That is literally this algorithm
+        running over a price series. Trading platforms compute this for entire histories in
+        one pass rather than comparing every day against every later day.
+      </p>
+      <p>
+        <b>Weather apps.</b> &ldquo;How many days until it gets warmer?&rdquo; is the same
+        problem asking for the <i>index</i> instead of the value &mdash; the well-known
+        <i>Daily Temperatures</i> question.
+      </p>
+      <p>
+        <b>Skyline visibility.</b> An architect checking which buildings on a street still
+        have an unobstructed view toward the horizon is discarding exactly the same shadowed
+        candidates: a shorter building behind a taller one is invisible and can be forgotten.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128256;</span> Logic Flow Chart</h2>
+      <div class='flow-wrap'>
+        <svg viewBox='0 0 800 840' xmlns='http://www.w3.org/2000/svg' style='max-width:100%; height:auto;'>
+          <defs>
+            <marker id='arrow' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto' markerUnits='strokeWidth'>
+              <path d='M0,0 L0,6 L9,3 z' fill='#38bdf8'/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .fail { fill:#2a1020; stroke:#fb7185; stroke-width:2; rx:12; }
+            .pass { fill:#0d2a20; stroke:#34d399; stroke-width:2; rx:12; }
+            .lbl { fill:#e2e8f0; font-family: Segoe UI, sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x='245' y='10' width='230' height='46' class='box'/>
+          <text x='360' y='38' class='lbl'>Start: array nums</text>
+          <line x1='360' y1='56' x2='360' y2='88' class='edge'/>
+
+          <rect x='205' y='88' width='310' height='46' class='box'/>
+          <text x='360' y='116' class='lbl'>Empty stack, i = n - 1</text>
+          <line x1='360' y1='134' x2='360' y2='166' class='edge'/>
+
+          <rect x='250' y='166' width='220' height='46' class='box'/>
+          <text x='360' y='194' class='lbl'>Look at nums[i]</text>
+          <line x1='360' y1='212' x2='360' y2='246' class='edge'/>
+
+          <polygon points='360,246 520,301 360,356 200,301' class='decision'/>
+          <text x='360' y='294' class='lbl'>Stack not empty AND</text>
+          <text x='360' y='312' class='lbl'>top &#8804; nums[i] ?</text>
+
+          <line x1='520' y1='301' x2='573' y2='301' class='edge'/>
+          <text x='547' y='293' class='lbl small'>Yes</text>
+          <rect x='575' y='278' width='135' height='46' class='box'/>
+          <text x='642' y='306' class='lbl'>Pop the top</text>
+
+          <line x1='642' y1='278' x2='642' y2='230' class='edge'/>
+          <line x1='642' y1='230' x2='435' y2='230' class='edge'/>
+          <line x1='435' y1='230' x2='435' y2='268' class='edge'/>
+          <text x='530' y='222' class='lbl small'>check again</text>
+
+          <line x1='360' y1='356' x2='360' y2='392' class='edge'/>
+          <text x='380' y='380' class='lbl small'>No</text>
+
+          <polygon points='360,392 500,447 360,502 220,447' class='decision'/>
+          <text x='360' y='452' class='lbl'>Is the stack empty?</text>
+
+          <line x1='220' y1='447' x2='152' y2='447' class='edge'/>
+          <text x='186' y='439' class='lbl small'>Yes</text>
+          <rect x='10' y='424' width='140' height='46' class='fail'/>
+          <text x='80' y='452' class='lbl'>ans[i] = -1</text>
+
+          <line x1='500' y1='447' x2='553' y2='447' class='edge'/>
+          <text x='527' y='439' class='lbl small'>No</text>
+          <rect x='555' y='424' width='155' height='46' class='pass'/>
+          <text x='632' y='452' class='lbl'>ans[i] = top</text>
+
+          <line x1='80' y1='470' x2='80' y2='545' class='edge'/>
+          <line x1='80' y1='545' x2='360' y2='545' class='edge'/>
+          <line x1='632' y1='470' x2='632' y2='545' class='edge'/>
+          <line x1='632' y1='545' x2='360' y2='545' class='edge'/>
+          <line x1='360' y1='545' x2='360' y2='558' class='edge'/>
+
+          <rect x='175' y='560' width='370' height='46' class='box'/>
+          <text x='360' y='588' class='lbl'>Push nums[i], then i = i - 1</text>
+          <line x1='360' y1='606' x2='360' y2='638' class='edge'/>
+
+          <polygon points='360,638 500,690 360,742 220,690' class='decision'/>
+          <text x='360' y='695' class='lbl'>i &#8805; 0 ?</text>
+
+          <line x1='500' y1='690' x2='745' y2='690' class='edge'/>
+          <text x='620' y='682' class='lbl small'>Yes, next element</text>
+          <line x1='745' y1='690' x2='745' y2='189' class='edge'/>
+          <line x1='745' y1='189' x2='472' y2='189' class='edge'/>
+
+          <line x1='360' y1='742' x2='360' y2='772' class='edge'/>
+          <text x='380' y='762' class='lbl small'>No</text>
+
+          <rect x='270' y='774' width='180' height='46' class='pass'/>
+          <text x='360' y='802' class='lbl'>Return ans</text>
+        </svg>
+      </div>
+      <p class='note'>
+        The array is consumed from right to left. The inner pop loop discards shadowed
+        candidates, and the stack stays decreasing from bottom to top at all times.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#9881;</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force</td><td>O(n&sup2;)</td><td>O(1) extra</td><td>For every index, scan forward until a strictly greater value appears; stop at the first one</td></tr>
+        <tr><td>Monotonic Stack (Optimized)</td><td>O(n)</td><td>O(n)</td><td>Traverse right to left, popping every candidate <code>&#8804; nums[i]</code>; the survivor on top is the answer</td></tr>
+      </table>
+      <div class='complexity' style='margin-top:16px;'>
+        <div class='pill'><h3>Why the stack wins</h3><p>Each element is pushed once and popped at most once. Amortised, that is two operations per element regardless of how the inner while loop behaves on any single step.</p></div>
+        <div class='pill'><h3>Trade-off</h3><p>You spend O(n) auxiliary space to buy back a factor of n in time. On a strictly decreasing array the brute force degenerates to a full O(n&sup2;) scan while the stack still finishes in one pass.</p></div>
+      </div>
+      <p style='color:#94a3b8; font-size:0.88rem;'>
+        <b>Edge cases worth remembering:</b> an empty array returns an empty result; a single
+        element is always <code>-1</code>; duplicates stay <code>-1</code> because the comparison
+        is <i>strictly</i> greater (use <code>&lt;</code> instead of <code>&#8804;</code> in the pop
+        condition if you want equal values to count); and a strictly increasing array makes every
+        answer the immediate neighbour.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128161;</span> Where This Pattern Shows Up Next</h2>
+      <p>
+        Learn this skeleton once and a whole family of problems collapses into it:
+        <b>Daily Temperatures</b> (same thing, return indices), <b>Stock Span</b> (mirror it to
+        look left), <b>Next Greater Element II</b> (circular array &mdash; loop twice),
+        <b>Largest Rectangle in Histogram</b> (find the nearest smaller bar on each side), and
+        <b>Trapping Rain Water</b>. The only things that change are the direction of travel and
+        whether the comparison is greater or smaller.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128193;</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + monotonic stack + index variant)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + monotonic stack + index variant)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 7 &middot; Stacks &middot; Generated 2026-09-13
+  </footer>
+
+</body>
+</html>

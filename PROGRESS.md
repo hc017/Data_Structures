@@ -10,6 +10,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 | 4   | 2026-07-27 | Sliding Window | Longest Substring Without Repeating Characters | `SlidingWindow/LongestSubstringWithoutRepeatingCharacters` |
 | 5   | 2026-07-30 | Hashing | Group Anagrams | `Hashing/GroupAnagrams` |
 | 6   | 2026-08-11 | Stacks | Valid Parentheses | `Stacks/ValidParentheses` |
+| 7   | 2026-09-13 | Stacks | Next Greater Element | `Stacks/NextGreaterElement` |
 
 ## Versioning
 
