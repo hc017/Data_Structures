@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<title>Implement Queue Using Stacks - Queues</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+    --bad: #fb7185;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: Cascadia Code, Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  .note { color: var(--muted); font-size: 0.85rem; text-align: center; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class='hero'>
+    <h1>Implement Queue Using Stacks</h1>
+    <p class='tag'>Day 8 &middot; Topic: Queues &middot; Daily DSA Challenge</p>
+    <div class='badges'>
+      <span class='badge'>Difficulty: Easy</span>
+      <span class='badge'>Pattern: Two Stacks / Amortised Analysis</span>
+      <span class='badge'>Time: O(1) amortised</span>
+      <span class='badge'>Space: O(n)</span>
+    </div>
+  </div>
+
+  <div class='container'>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#129513;</span> The Problem</h2>
+      <p>
+        Build a <b>FIFO queue</b> using nothing but <b>stack</b> operations &mdash;
+        <code>push</code>, <code>pop</code>, <code>top</code> and <code>isEmpty</code>.
+        No arrays with indices, no linked lists, no built-in deque. Only stacks.
+      </p>
+      <p>You must support four operations:</p>
+      <table>
+        <tr><th>Operation</th><th>Meaning</th></tr>
+        <tr><td><code>push(x)</code></td><td>Add <code>x</code> to the <b>back</b> of the queue</td></tr>
+        <tr><td><code>pop()</code></td><td>Remove and return the element at the <b>front</b></td></tr>
+        <tr><td><code>peek()</code></td><td>Return the front element without removing it</td></tr>
+        <tr><td><code>empty()</code></td><td>Is the queue empty?</td></tr>
+      </table>
+      <pre>push(1)   -> queue: front [1] back
+push(2)   -> queue: front [1, 2] back
+push(3)   -> queue: front [1, 2, 3] back
+peek()    -> 1        // oldest element, not the newest
+pop()     -> 1        // queue: front [2, 3] back
+push(4)   -> queue: front [2, 3, 4] back
+pop()     -> 2
+pop()     -> 3
+pop()     -> 4
+empty()   -> true</pre>
+      <p style='color:#94a3b8; font-size:0.9rem;'>
+        The whole difficulty is the mismatch: a stack hands back the <i>newest</i> item,
+        a queue must hand back the <i>oldest</i> one. We need to flip the order somewhere.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128214;</span> The Story</h2>
+      <p class='story'>
+        Imagine a narrow kitchen with a <b>stack of dirty plates</b>. Plates go on top,
+        and you can only ever take the top one off &mdash; that is a stack. But the house
+        rule is fair play: the plate that has been <i>waiting the longest</i> must be washed
+        first. The plate at the very bottom. Awkward.<br><br>
+        Here is the trick. Keep <b>two</b> piles on the counter: an <b>IN pile</b> and an
+        <b>OUT pile</b>. Every dirty plate that arrives simply goes on the IN pile. No
+        thinking, no shuffling, instant.<br><br>
+        When it is time to wash one, look at the OUT pile first. If it has plates, wash the
+        top one &mdash; done. If the OUT pile is <b>empty</b>, then move every plate from IN
+        to OUT, one at a time. Because you take from the top of IN and place on the top of
+        OUT, the pile arrives <b>upside down</b>: the oldest plate, once buried at the
+        bottom, is now sitting proudly on top. Wash it.<br><br>
+        The one rule you must never break: <b>only refill OUT when it is completely empty.</b>
+        If you dump fresh plates on top of a half-used OUT pile, newcomers jump the queue and
+        fairness is destroyed.<br><br>
+        Does all that carrying make it slow? Look closer. Each plate is carried from IN to OUT
+        <b>exactly once in its whole life</b>. It is placed once, moved once, washed once.
+        Three touches per plate, no matter how the work is spread out. One unlucky wash may
+        involve hauling twenty plates &mdash; but the next nineteen washes are then free.
+      </p>
+      <p>
+        That last paragraph is <b>amortised analysis</b>. A single <code>pop()</code> can cost
+        O(n) in the worst case, yet any sequence of <i>n</i> operations costs O(n) in total,
+        so the <b>average cost per operation is O(1)</b>. Averaged over time, not averaged
+        over lucky inputs &mdash; this is a guarantee, not a hope.
+      </p>
+      <p>
+        The lazy alternative is to pay up front: reverse the whole stack on every single
+        <code>push</code> so the front is always on top. That works too, but it makes push
+        O(n) and wastes effort re-reversing elements nobody asked for yet. Doing work only
+        when it is actually needed is almost always the better deal.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#127757;</span> Real-Life Example</h2>
+      <p>
+        <b>A printer spooler.</b> Documents arrive in bursts and must print in the order they
+        were sent. The receiving buffer collects jobs as fast as they come (the IN pile) while
+        the print engine drains a prepared batch (the OUT pile). Nobody reorders the batch
+        mid-print &mdash; a new burst waits for the current batch to finish.
+      </p>
+      <p>
+        <b>Customer support tickets.</b> New tickets land in an inbox instantly with no sorting.
+        Periodically an agent pulls the whole inbox into a working list, oldest-first, and works
+        through it. Fresh tickets pile up in the inbox meanwhile &mdash; they do not cut in front
+        of someone who has been waiting since morning.
+      </p>
+      <p>
+        <b>Undo and redo.</b> The same two-pile idea, one step sideways: actions move between
+        two stacks and the direction of travel decides whether you are undoing or redoing.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128256;</span> Logic Flow Chart</h2>
+      <div class='flow-wrap'>
+        <svg viewBox='0 0 800 880' xmlns='http://www.w3.org/2000/svg' style='max-width:100%; height:auto;'>
+          <defs>
+            <marker id='arrow' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto' markerUnits='strokeWidth'>
+              <path d='M0,0 L0,6 L9,3 z' fill='#38bdf8'/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .fail { fill:#2a1020; stroke:#fb7185; stroke-width:2; rx:12; }
+            .pass { fill:#0d2a20; stroke:#34d399; stroke-width:2; rx:12; }
+            .lbl { fill:#e2e8f0; font-family: Segoe UI, sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x='250' y='10' width='220' height='46' class='box'/>
+          <text x='360' y='38' class='lbl'>Incoming operation</text>
+          <line x1='360' y1='56' x2='360' y2='92' class='edge'/>
+
+          <polygon points='360,92 520,147 360,202 200,147' class='decision'/>
+          <text x='360' y='142' class='lbl'>Is it a</text>
+          <text x='360' y='160' class='lbl'>push(x) ?</text>
+
+          <line x1='200' y1='147' x2='140' y2='147' class='edge'/>
+          <text x='170' y='139' class='lbl small'>Yes</text>
+          <rect x='5' y='124' width='133' height='46' class='pass'/>
+          <text x='71' y='145' class='lbl'>Push x onto</text>
+          <text x='71' y='163' class='lbl'>IN stack</text>
+
+          <line x1='71' y1='170' x2='71' y2='824' class='edge'/>
+          <text x='104' y='500' class='lbl small'>done, O(1)</text>
+
+          <line x1='360' y1='202' x2='360' y2='238' class='edge'/>
+          <text x='382' y='226' class='lbl small'>No &mdash; pop / peek</text>
+
+          <polygon points='360,238 520,293 360,348 200,293' class='decision'/>
+          <text x='360' y='288' class='lbl'>Is the OUT</text>
+          <text x='360' y='306' class='lbl'>stack empty?</text>
+
+          <line x1='520' y1='293' x2='580' y2='293' class='edge'/>
+          <text x='550' y='285' class='lbl small'>No</text>
+          <rect x='582' y='270' width='150' height='46' class='box'/>
+          <text x='657' y='298' class='lbl'>Skip transfer</text>
+
+          <line x1='360' y1='348' x2='360' y2='384' class='edge'/>
+          <text x='380' y='372' class='lbl small'>Yes</text>
+
+          <polygon points='360,384 520,439 360,494 200,439' class='decision'/>
+          <text x='360' y='434' class='lbl'>Is the IN</text>
+          <text x='360' y='452' class='lbl'>stack empty too?</text>
+
+          <line x1='200' y1='439' x2='150' y2='439' class='edge'/>
+          <text x='175' y='431' class='lbl small'>Yes</text>
+          <rect x='5' y='416' width='143' height='46' class='fail'/>
+          <text x='76' y='437' class='lbl'>Queue empty:</text>
+          <text x='76' y='455' class='lbl'>raise error</text>
+
+          <line x1='360' y1='494' x2='360' y2='528' class='edge'/>
+          <text x='380' y='518' class='lbl small'>No</text>
+
+          <rect x='185' y='530' width='350' height='64' class='box'/>
+          <text x='360' y='555' class='lbl'>Pop every item from IN and</text>
+          <text x='360' y='578' class='lbl'>push it onto OUT (order flips)</text>
+
+          <line x1='360' y1='594' x2='360' y2='636' class='edge'/>
+          <line x1='657' y1='316' x2='657' y2='615' class='edge'/>
+          <line x1='657' y1='615' x2='360' y2='615' class='edge'/>
+
+          <rect x='225' y='638' width='270' height='46' class='box'/>
+          <text x='360' y='666' class='lbl'>Front of queue = top of OUT</text>
+          <line x1='360' y1='684' x2='360' y2='716' class='edge'/>
+
+          <polygon points='360,716 500,768 360,820 220,768' class='decision'/>
+          <text x='360' y='773' class='lbl'>pop or peek?</text>
+
+          <line x1='500' y1='768' x2='575' y2='768' class='edge'/>
+          <text x='537' y='760' class='lbl small'>peek</text>
+          <rect x='577' y='745' width='160' height='46' class='pass'/>
+          <text x='657' y='773' class='lbl'>Return top, keep</text>
+
+          <line x1='360' y1='820' x2='360' y2='848' class='edge'/>
+          <text x='392' y='840' class='lbl small'>pop</text>
+          <rect x='240' y='850' width='240' height='46' class='pass'/>
+          <text x='360' y='878' class='lbl'>Pop top and return it</text>
+        </svg>
+      </div>
+      <p class='note'>
+        Pushes never touch the OUT stack. Transfers happen only when OUT has run dry &mdash;
+        that single condition is what preserves FIFO order.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#9881;</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Costly Push (brute force)</td><td>push O(n), pop/peek O(1)</td><td>O(n)</td><td>On every push, empty the stack into a helper, drop the newcomer at the bottom, pour everything back. The front always sits on top.</td></tr>
+        <tr><td>Two Stacks, lazy transfer (optimised)</td><td>push O(1), pop/peek O(1) amortised</td><td>O(n)</td><td>Push onto IN. Refill OUT from IN only when OUT is empty; the pour reverses the order exactly once.</td></tr>
+      </table>
+      <div class='complexity' style='margin-top:16px;'>
+        <div class='pill'><h3>Why lazy wins</h3><p>Each element crosses from IN to OUT at most once ever. Any sequence of n operations does at most 2n stack moves, so the amortised cost per operation is a constant.</p></div>
+        <div class='pill'><h3>Trade-off</h3><p>One individual pop can still cost O(n). If you need a hard worst-case bound per call &mdash; a real-time system, say &mdash; the costly-push version gives you O(1) pops at the price of O(n) pushes.</p></div>
+      </div>
+      <p style='color:#94a3b8; font-size:0.88rem;'>
+        <b>Edge cases worth remembering:</b> <code>pop()</code> or <code>peek()</code> on an empty
+        queue must fail loudly &mdash; check <i>both</i> stacks, not just one; <code>empty()</code>
+        is true only when IN <b>and</b> OUT are both empty; and interleaving pushes with pops is the
+        case that actually catches bugs &mdash; push 1,2, pop, push 3, pop, pop should yield 1, 2, 3.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128161;</span> Where This Pattern Shows Up Next</h2>
+      <p>
+        The mirror problem is <b>Implement Stack Using Queues</b>, which is instructive precisely
+        because the trick does <i>not</i> flip around neatly. The amortisation argument here is the
+        same one behind <b>dynamic array resizing</b> (why <code>ArrayList.add</code> is O(1)
+        amortised despite occasional doubling) and behind the two-stack <b>Min Queue</b>. The
+        two-container idea reappears in <b>Undo/Redo</b>, in <b>double-ended sliding windows</b>,
+        and in <b>BFS with a frontier and a next-frontier</b>.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128193;</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (costly-push queue + two-stack queue with demo)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (costly-push queue + two-stack queue with demo)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 8 &middot; Queues &middot; Generated 2026-09-14
+  </footer>
+
+</body>
+</html>
