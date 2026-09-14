@@ -1,11 +1,9 @@
-package Queues.ImplementQueueUsingStacks;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.NoSuchElementException;
 
 /**
- * Day 8 - Queues - Implement Queue Using Stacks
+ * Day 8 - Queues: Implement Queue Using Stacks
  *
  * Problem:
  *   Build a FIFO queue (first-in, first-out) using ONLY stack operations:
@@ -15,9 +13,8 @@ import java.util.NoSuchElementException;
  *     peek()   - return the front element without removing it
  *     empty()  - is the queue empty?
  *
- * A stack is LIFO. A queue is FIFO. Reversing a stack into a second stack
- * flips the order, and two flips give back the original order - which is
- * exactly the trick that makes this work.
+ * A stack is LIFO. A queue is FIFO. Pouring one stack into another flips the
+ * order, and that single flip is exactly the conversion we need.
  *
  * Two approaches are implemented below:
  *   1. CostlyPushQueue  - push is O(n), pop/peek are O(1)
@@ -75,7 +72,7 @@ public class Solution {
     }
 
     /* ------------------------------------------------------------------
-     * APPROACH 2 (optimised): two stacks, transfer lazily
+     * APPROACH 2 (optimized): two stacks, transfer lazily
      * ------------------------------------------------------------------
      * inStack  - everything that has arrived recently, newest on top
      * outStack - elements already reversed, so the QUEUE FRONT is on top
@@ -84,9 +81,12 @@ public class Solution {
      * pop   -> if outStack is empty, pour ALL of inStack into it
      *          (this reverses the order exactly once), then pop.  amortised O(1)
      *
-     * The key insight: never transfer while outStack still has items, or the
-     * ordering breaks. Each element is moved between stacks at most once in
-     * its lifetime, so n operations cost O(n) total -> O(1) amortised.
+     * The key rule: never transfer while outStack still holds items, or new
+     * arrivals would cut in front of older ones and FIFO order would break.
+     *
+     * Each element is moved between the stacks at most once in its lifetime,
+     * so n operations cost O(n) in total -> O(1) amortised per operation,
+     * even though one individual pop can cost O(n).
      */
     static class TwoStackQueue {
         private final Deque<Integer> inStack = new ArrayDeque<>();
@@ -136,8 +136,9 @@ public class Solution {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder("front [");
-            // outStack top-to-bottom is already front-to-back
             boolean first = true;
+            // iterating an ArrayDeque used as a stack yields top-to-bottom,
+            // and outStack top-to-bottom is already front-to-back
             for (Integer v : outStack) {
                 if (!first) sb.append(", ");
                 sb.append(v);
@@ -154,8 +155,9 @@ public class Solution {
         }
     }
 
-    /* ------------------------------------------------------------------ */
-
+    // ---------------------------------------------------------------------
+    // DEMO
+    // ---------------------------------------------------------------------
     public static void main(String[] args) {
         System.out.println("=== Approach 2: Two Stacks (amortised O(1)) ===");
         TwoStackQueue q = new TwoStackQueue();
@@ -190,6 +192,16 @@ public class Solution {
         System.out.println("pop()  = " + slow.pop());         // 30
         System.out.println("pop()  = " + slow.pop());         // 40
         System.out.println("empty? = " + slow.empty());       // true
+
+        System.out.println();
+        System.out.println("=== Interleaved push/pop (the case that catches bugs) ===");
+        TwoStackQueue mix = new TwoStackQueue();
+        mix.push(1);
+        mix.push(2);
+        System.out.println("pop()  = " + mix.pop());          // 1
+        mix.push(3);
+        System.out.println("pop()  = " + mix.pop());          // 2  (NOT 3)
+        System.out.println("pop()  = " + mix.pop());          // 3
 
         System.out.println();
         System.out.println("=== Edge case: popping an empty queue ===");
