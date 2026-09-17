@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<title>Reverse a Linked List - Linked Lists</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+    --bad: #fb7185;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .emoji { font-size: 1.4rem; }
+  .story {
+    border-left: 3px solid var(--accent2);
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre {
+    font-family: Cascadia Code, Consolas, monospace;
+  }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { color: var(--accent); }
+  .complexity {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  .note { color: var(--muted); font-size: 0.85rem; text-align: center; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class='hero'>
+    <h1>Reverse a Linked List</h1>
+    <p class='tag'>Day 9 &middot; Topic: Linked Lists &middot; Daily DSA Challenge</p>
+    <div class='badges'>
+      <span class='badge'>Difficulty: Easy</span>
+      <span class='badge'>Pattern: Pointer Manipulation / Three Pointers</span>
+      <span class='badge'>Time: O(n)</span>
+      <span class='badge'>Space: O(1)</span>
+    </div>
+  </div>
+
+  <div class='container'>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#129513;</span> The Problem</h2>
+      <p>
+        You are handed the <code>head</code> of a <b>singly linked list</b>. Reverse it and
+        return the new head. Every node knows only one thing &mdash; who comes <i>next</i>.
+        There is no <code>prev</code> pointer to lean on, and no way to walk backwards.
+      </p>
+      <p>
+        The catch that makes this a real exercise: you must reverse it by <b>re-pointing the
+        existing arrows</b>, not by copying the values into an array and pouring them back.
+        Rewriting values is cheating the lesson; rewiring pointers is the lesson.
+      </p>
+      <pre>Input :  1 -> 2 -> 3 -> 4 -> 5 -> null
+Output:  5 -> 4 -> 3 -> 2 -> 1 -> null
+
+Input :  7 -> 9 -> null          Input :  42 -> null        Input :  null
+Output:  9 -> 7 -> null          Output:  42 -> null        Output:  null</pre>
+      <p style='color:#94a3b8; font-size:0.9rem;'>
+        Notice what the answer must contain: the <b>old tail</b> becomes the new head, and the
+        <b>old head</b> becomes the new tail &mdash; so its <code>next</code> has to end up
+        <code>null</code>. Forgetting that one detail is the classic way to build an infinite loop.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128214;</span> The Story</h2>
+      <p class='story'>
+        Picture a <b>paper treasure hunt</b> through a school. Each classroom holds a single
+        slip of paper, and the slip says only one thing: <i>&ldquo;go to the library next.&rdquo;</i>
+        The library's slip says <i>&ldquo;go to the canteen next.&rdquo;</i> And so on, down a chain, until
+        one room holds a slip that says <i>&ldquo;the end.&rdquo;</i> That chain of slips is a linked list.
+        You can follow it forwards easily. Going backwards is impossible &mdash; no slip ever
+        mentions where you came <i>from</i>.<br><br>
+        Now the principal wants the hunt run in <b>reverse</b>. The last room should be the
+        starting point, and the old starting room should hold the &ldquo;the end&rdquo; slip.<br><br>
+        A nervous student would copy every room name onto a notepad, walk the list backwards
+        on paper, then write a fresh slip for every room. It works. It also means carrying a
+        notepad as long as the hunt itself.<br><br>
+        A calm student walks the hunt <b>once</b>, carrying just <b>three facts</b> in their
+        head: the room they <b>just came from</b>, the room they are <b>standing in</b>, and
+        the room the current slip <b>points to</b>. In each room they do four small things,
+        always in this order:<br><br>
+        <b>1. Read</b> the slip and memorise where it says to go &mdash; this is the only
+        moment that information exists. Overwrite first and the rest of the hunt is lost
+        forever.<br>
+        <b>2. Rewrite</b> the slip to point at the room they came from instead.<br>
+        <b>3. Remember</b> that this room is now &ldquo;where I came from&rdquo;.<br>
+        <b>4. Walk</b> to the room they memorised in step 1.<br><br>
+        The very first room has nothing behind it, so its slip is rewritten to say
+        <i>&ldquo;the end.&rdquo;</i> When the student finally steps out of the chain into nothing,
+        the room they came from is the <b>new start</b> of the hunt.<br><br>
+        One walk. Three facts in memory. No notepad.
+      </p>
+      <p>
+        Those three facts are the three pointers: <code>prev</code>, <code>cur</code>,
+        <code>next</code>. The order of the four steps is the entire algorithm, and swapping
+        steps 1 and 2 is the single most common bug in this problem &mdash; you cut the rope
+        you are still standing on.
+      </p>
+      <pre>prev = null                     cur = 1 -> 2 -> 3 -> 4 -> 5 -> null
+
+step 1:   null &lt;- 1              cur = 2 -> 3 -> 4 -> 5 -> null
+step 2:   null &lt;- 1 &lt;- 2         cur = 3 -> 4 -> 5 -> null
+step 3:   null &lt;- 1 &lt;- 2 &lt;- 3    cur = 4 -> 5 -> null
+step 4:   null &lt;- ... &lt;- 4       cur = 5 -> null
+step 5:   null &lt;- ... &lt;- 5       cur = null   &lt;-- stop, prev = 5 = new head</pre>
+      <p style='color:#94a3b8; font-size:0.9rem;'>
+        Read the left column as &ldquo;already reversed&rdquo; and the right column as &ldquo;not yet touched&rdquo;.
+        The boundary between them slides one node per step, and the two halves are never
+        broken at the same time &mdash; that is why the list is never corrupted mid-flight.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#127757;</span> Real-Life Example</h2>
+      <p>
+        <b>A train that has to go back.</b> Carriages are coupled front-to-back, and each
+        coupling only knows the carriage behind it. To send the train the other way you do not
+        rebuild the train &mdash; you re-couple. The guard's van becomes the engine end, the
+        engine end becomes the tail. Same carriages, reversed couplings, one pass down the
+        platform.
+      </p>
+      <p>
+        <b>A chain of email forwards.</b> A message gets forwarded person to person, each one
+        knowing only who they sent it to. To trace the thread from the last recipient back to
+        the original sender, someone has to walk the chain once and flip every &ldquo;sent to&rdquo; into
+        a &ldquo;received from&rdquo;.
+      </p>
+      <p>
+        <b>Browser history, in the real implementation.</b> A doubly linked list gives you
+        Back and Forward for free precisely <i>because</i> it stores both directions. Reversing
+        a singly linked list is what you are forced to do when that second pointer was never
+        paid for &mdash; a neat illustration of the memory-versus-convenience trade.
+      </p>
+      <p>
+        <b>Reversing a log of actions for undo.</b> Any &ldquo;replay these steps backwards&rdquo;
+        feature over a singly linked history is this exact operation.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128256;</span> Logic Flow Chart</h2>
+      <div class='flow-wrap'>
+        <svg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg' style='max-width:100%; height:auto;'>
+          <defs>
+            <marker id='arrow' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto' markerUnits='strokeWidth'>
+              <path d='M0,0 L0,6 L9,3 z' fill='#38bdf8'/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; rx:12; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .fail { fill:#2a1020; stroke:#fb7185; stroke-width:2; rx:12; }
+            .pass { fill:#0d2a20; stroke:#34d399; stroke-width:2; rx:12; }
+            .lbl { fill:#e2e8f0; font-family: Segoe UI, sans-serif; font-size:15px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+          </style>
+
+          <rect x='250' y='10' width='260' height='46' class='box'/>
+          <text x='380' y='38' class='lbl'>Start with head of list</text>
+          <line x1='380' y1='56' x2='380' y2='92' class='edge'/>
+
+          <rect x='245' y='94' width='270' height='64' class='box'/>
+          <text x='380' y='119' class='lbl'>prev = null</text>
+          <text x='380' y='142' class='lbl'>cur = head</text>
+          <line x1='380' y1='158' x2='380' y2='194' class='edge'/>
+
+          <polygon points='380,194 540,249 380,304 220,249' class='decision'/>
+          <text x='380' y='244' class='lbl'>Is cur</text>
+          <text x='380' y='262' class='lbl'>null ?</text>
+
+          <line x1='540' y1='249' x2='610' y2='249' class='edge'/>
+          <text x='575' y='241' class='lbl small'>Yes</text>
+          <rect x='612' y='226' width='175' height='46' class='pass'/>
+          <text x='699' y='247' class='lbl'>Done &mdash; return</text>
+          <text x='699' y='265' class='lbl'>prev as new head</text>
+
+          <line x1='380' y1='304' x2='380' y2='338' class='edge'/>
+          <text x='402' y='328' class='lbl small'>No</text>
+
+          <rect x='215' y='340' width='330' height='46' class='box'/>
+          <text x='380' y='368' class='lbl'>1. next = cur.next  (save it!)</text>
+          <line x1='380' y1='386' x2='380' y2='420' class='edge'/>
+
+          <rect x='215' y='422' width='330' height='46' class='fail'/>
+          <text x='380' y='450' class='lbl'>2. cur.next = prev  (flip arrow)</text>
+          <line x1='380' y1='468' x2='380' y2='502' class='edge'/>
+
+          <rect x='215' y='504' width='330' height='46' class='box'/>
+          <text x='380' y='532' class='lbl'>3. prev = cur  (prefix grows)</text>
+          <line x1='380' y1='550' x2='380' y2='584' class='edge'/>
+
+          <rect x='215' y='586' width='330' height='46' class='box'/>
+          <text x='380' y='614' class='lbl'>4. cur = next  (step forward)</text>
+
+          <path d='M215,609 L120,609 L120,249 L216,249' class='edge'/>
+          <text x='158' y='440' class='lbl small'>loop back</text>
+
+          <rect x='560' y='400' width='235' height='120' class='box' style='stroke:#a78bfa;'/>
+          <text x='677' y='428' class='lbl' style='fill:#a78bfa;'>Why step 1 first?</text>
+          <text x='677' y='452' class='lbl small'>Step 2 overwrites cur.next.</text>
+          <text x='677' y='472' class='lbl small'>If you have not saved it,</text>
+          <text x='677' y='492' class='lbl small'>the rest of the list is</text>
+          <text x='677' y='512' class='lbl small'>unreachable forever.</text>
+
+          <rect x='215' y='680' width='330' height='90' class='box' style='stroke:#34d399;'/>
+          <text x='380' y='708' class='lbl' style='fill:#34d399;'>Invariant, every loop</text>
+          <text x='380' y='732' class='lbl small'>prev = head of reversed prefix</text>
+          <text x='380' y='754' class='lbl small'>cur  = head of untouched suffix</text>
+        </svg>
+      </div>
+      <p class='note'>
+        Four statements, one loop, three pointers. The order of the four statements is the
+        whole algorithm &mdash; reorder them and you either lose the tail or spin forever.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#9881;</span> Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Copy values to array (brute force)</td><td>O(n)</td><td>O(n)</td><td>Walk the list collecting values, then build a brand new list from the values backwards. Simple, but allocates a second container and a second set of nodes.</td></tr>
+        <tr><td>Three-pointer iteration (optimised)</td><td>O(n)</td><td>O(1)</td><td>One pass. Save <code>next</code>, flip <code>cur.next</code> to <code>prev</code>, slide both pointers forward. Nothing is allocated at all.</td></tr>
+        <tr><td>Recursion</td><td>O(n)</td><td>O(n) stack</td><td>Reverse the tail, then point <code>head.next.next</code> back at <code>head</code> and null out <code>head.next</code>. Elegant, but one stack frame per node.</td></tr>
+      </table>
+      <div class='complexity' style='margin-top:16px;'>
+        <div class='pill'><h3>Why iteration wins</h3><p>Same O(n) time as the others but O(1) space and no allocation. It also mutates the list in place, which is usually exactly what the caller wanted.</p></div>
+        <div class='pill'><h3>Where recursion bites</h3><p>One frame per node. A list of a million nodes overflows the stack &mdash; Python raises <code>RecursionError</code> well before that, at around a thousand. Fine for interviews, risky in production.</p></div>
+      </div>
+      <p style='color:#94a3b8; font-size:0.88rem;'>
+        <b>Edge cases worth remembering:</b> an <b>empty list</b> must return <code>null</code>
+        rather than crash &mdash; the loop simply never runs; a <b>single node</b> comes back
+        unchanged; the <b>old head must end with <code>next = null</code></b>, which happens for
+        free because <code>prev</code> starts as <code>null</code>; <b>reversing twice</b> must
+        return the original ordering, which is the cheapest correctness test you can write; and
+        remember the caller's old <code>head</code> variable now points at the <b>tail</b> &mdash;
+        always use the returned head.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128161;</span> Where This Pattern Shows Up Next</h2>
+      <p>
+        This is the load-bearing subroutine for half of the linked list catalogue.
+        <b>Palindrome Linked List</b> finds the middle, reverses the second half and compares.
+        <b>Reverse Nodes in k-Group</b> and <b>Reverse Linked List II</b> are this loop applied
+        to a slice. <b>Reorder List</b> is split, reverse, merge. <b>Add Two Numbers II</b>
+        reverses both inputs to get least-significant digits first. The same
+        save-then-overwrite discipline reappears in <b>Flatten a Multilevel List</b>, in
+        <b>swapping pairs</b>, and in Floyd's cycle detection, where a careless pointer update
+        silently invents a loop.
+      </p>
+    </div>
+
+    <div class='card'>
+      <h2><span class='emoji'>&#128193;</span> Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java implementation (brute force + iterative + recursive, with demo)</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python implementation (brute force + iterative + recursive, with demo and self-checks)</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer &mdash; story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 9 &middot; Linked Lists &middot; Generated 2026-09-17
+  </footer>
+
+</body>
+</html>
