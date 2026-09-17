@@ -12,6 +12,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 | 6   | 2026-08-11 | Stacks | Valid Parentheses | `Stacks/ValidParentheses` |
 | 7   | 2026-09-13 | Stacks | Next Greater Element | `Stacks/NextGreaterElement` |
 | 8   | 2026-09-14 | Queues | Implement Queue Using Stacks | `Queues/ImplementQueueUsingStacks` |
+| 9   | 2026-09-17 | Linked Lists | Reverse a Linked List | `LinkedLists/ReverseLinkedList` |
 
 ## Versioning
 
