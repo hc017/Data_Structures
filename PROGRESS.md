@@ -15,6 +15,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 | 9   | 2026-09-17 | Linked Lists | Reverse a Linked List | `LinkedLists/ReverseLinkedList` |
 | 10  | 2026-09-27 | Linked Lists | Detect Cycle in a Linked List (Floyd's Algorithm) | `LinkedLists/DetectCycleInLinkedList` |
 | 11  | 2026-09-28 | Recursion | Tower of Hanoi | `Recursion/TowerOfHanoi` |
+| 12  | 2026-09-29 | Recursion | Generate All Subsets (Power Set) | `Recursion/GenerateAllSubsets` |
 
 ## Versioning
 
