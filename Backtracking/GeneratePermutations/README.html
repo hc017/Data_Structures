@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 13 - Generate All Permutations</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0f1a;color:#d6dcea;font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+.wrap{max-width:960px;margin:auto;padding:24px}
+.hero{background:linear-gradient(135deg,#1e1b4b,#0f172a 60%,#064e3b);border:1px solid #27304a;border-radius:20px;padding:40px 32px;text-align:center}
+.hero h1{margin:8px 0 4px;font-size:2.4rem;background:linear-gradient(90deg,#a78bfa,#38bdf8,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:#94a3b8;margin:0 0 16px}
+.badge{display:inline-block;margin:4px;padding:5px 14px;border-radius:999px;font-size:.82rem;font-weight:600;border:1px solid #334155;background:#111827}
+.b1{color:#fbbf24}.b2{color:#a78bfa}.b3{color:#38bdf8}.b4{color:#34d399}.b5{color:#f472b6}
+.card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:24px 28px;margin-top:22px}
+.card h2{margin-top:0;font-size:1.5rem;background:linear-gradient(90deg,#38bdf8,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+code,pre{background:#0b1220;border:1px solid #1f2937;border-radius:8px;font-family:Consolas,monospace;color:#7dd3fc}
+code{padding:2px 6px}pre{padding:14px;overflow:auto}
+table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid #1f2937;padding:10px 12px;text-align:left}
+th{background:#1e293b;color:#a78bfa}tr:nth-child(even) td{background:#0f1626}
+svg{width:100%;height:auto;background:#0b1220;border-radius:12px;border:1px solid #1f2937}
+footer{text-align:center;color:#64748b;margin:30px 0 10px;font-size:.9rem}
+</style></head><body><div class="wrap">
+<div class="hero"><div class="badge b5">Day 13</div>
+<h1>Generate All Permutations</h1><p>Topic: Backtracking</p>
+<span class="badge b1">Difficulty: Medium</span><span class="badge b2">Pattern: Choose, Explore, Un-choose</span>
+<span class="badge b3">Time: O(n x n!)</span><span class="badge b4">Space: O(n) recursion</span></div>
+
+<div class="card"><h2>The Problem</h2>
+<p>Given an array of <b>distinct</b> integers, return every possible ordering of its elements.</p>
+<pre>Input : nums = [1, 2, 3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,2,1],[3,1,2]]   (3! = 6 results)</pre></div>
+
+<div class="card"><h2>The Story</h2>
+<p>Imagine three friends, Asha, Ben and Chitra, posing for a photo in a row of three spots. You want to see every possible lineup. You start at the first spot and ask: who stands here? Say Asha. Now only two people remain for the next spot: Ben or Chitra. Pick Ben, and Chitra has no choice, so you have a full lineup. Snap!</p>
+<p>Now the key trick: you politely ask Ben to step back out, and try Chitra in the second spot instead. When all options for the second spot are done, Asha steps out too, and Ben takes the first spot. That "step back out and try the next person" move is <b>backtracking</b>. In code, we do it with a swap, then swap back to undo it.</p></div>
+
+<div class="card"><h2>Real-Life Example</h2>
+<p>A delivery driver has 4 stops and wants to compare every possible order to find the shortest route. Trying every ordering of stops is exactly generating all permutations. Password crackers, seating-plan planners and test-case generators use the same idea. It only works for small n, since the count grows as n factorial.</p></div>
+
+<div class="card"><h2>Logic Flow Chart</h2>
+<svg viewBox="0 0 760 640" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,sans-serif" font-size="14">
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+<g stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#a)">
+<line x1="300" y1="50" x2="300" y2="90"/><line x1="300" y1="130" x2="300" y2="165"/>
+<line x1="300" y1="245" x2="300" y2="300"/><line x1="300" y1="360" x2="300" y2="400"/>
+<line x1="300" y1="440" x2="300" y2="480"/>
+<path d="M200 520 L80 520 L80 330 L190 330" />
+<path d="M420 205 L560 205 L560 250"/>
+<path d="M300 560 L300 600"/>
+</g>
+<g text-anchor="middle" fill="#e2e8f0">
+<rect x="200" y="10" width="200" height="40" rx="20" fill="#064e3b" stroke="#34d399"/><text x="300" y="35">Start: backtrack(start=0)</text>
+<rect x="190" y="90" width="220" height="40" rx="8" fill="#1e1b4b" stroke="#a78bfa"/><text x="300" y="115">Look at position start</text>
+<polygon points="300,165 420,205 300,245 180,205" fill="#1e293b" stroke="#fbbf24"/><text x="300" y="201">start == n ?</text><text x="300" y="219">(all fixed)</text>
+<rect x="470" y="250" width="180" height="50" rx="8" fill="#064e3b" stroke="#34d399"/><text x="560" y="272">Save copy of array</text><text x="560" y="290">then return</text>
+<text x="440" y="198" fill="#34d399">Yes</text><text x="312" y="275" fill="#f472b6">No</text>
+<rect x="190" y="300" width="220" height="60" rx="8" fill="#1e1b4b" stroke="#a78bfa"/><text x="300" y="325">For i = start .. n-1:</text><text x="300" y="345">swap(start, i)  [choose]</text>
+<rect x="190" y="400" width="220" height="40" rx="8" fill="#1e1b4b" stroke="#38bdf8"/><text x="300" y="425">backtrack(start+1) [explore]</text>
+<rect x="190" y="440" width="220" height="40" rx="8" fill="#1e1b4b" stroke="#f472b6"/><text x="300" y="465">swap(start, i) [un-choose]</text>
+<polygon points="300,480 400,520 300,560 200,520" fill="#1e293b" stroke="#fbbf24"/><text x="300" y="518">More i?</text><text x="300" y="535">loop back</text>
+<rect x="200" y="600" width="200" height="34" rx="17" fill="#064e3b" stroke="#34d399"/><text x="300" y="622">Done: all n! results</text>
+</g>
+<text x="90" y="500" fill="#fbbf24" font-size="12">Yes (next i)</text><text x="312" y="590" fill="#f472b6" font-size="12">No</text>
+</svg></div>
+
+<div class="card"><h2>Approaches Compared</h2>
+<table><tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+<tr><td>Insertion (brute force)</td><td>O(n x n!)</td><td>O(n x n!) intermediate lists</td><td>Insert each number into every slot of every smaller permutation.</td></tr>
+<tr><td>Backtracking with swaps (optimized)</td><td>O(n x n!)</td><td>O(n) recursion stack</td><td>Fix one position at a time, swap, recurse, undo. No extra used-array or intermediate lists.</td></tr></table></div>
+
+<footer>Day 13 | Backtracking: Generate All Permutations | 2026-10-18</footer>
+</div></body></html>
