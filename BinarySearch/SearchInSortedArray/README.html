@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binary Search - Search in a Sorted Array</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #16213e;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --good: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #0b1226);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0 0 60px 0;
+  }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: radial-gradient(circle at 50% -20%, rgba(56,189,248,0.25), transparent 60%);
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tag { color: var(--muted); margin: 0; font-size: 1.05rem; }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-top: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .story {
+    border-left: 3px solid var(--accent2);
+    color: var(--text);
+    font-style: italic;
+    background: rgba(167,139,250,0.06);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  code, pre { font-family: 'Cascadia Code', Consolas, monospace; }
+  pre {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.88rem;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; text-align: left; }
+  th { color: var(--accent); }
+  .complexity { display: flex; gap: 16px; flex-wrap: wrap; }
+  .pill {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pill h3 { margin: 0 0 4px; color: var(--good); font-size: 0.95rem; }
+  .pill p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  .flow-wrap { text-align: center; margin-top: 10px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Binary Search &mdash; Search in a Sorted Array</h1>
+    <p class="tag">Day 14 &middot; Topic: Binary Search &middot; Daily DSA Challenge</p>
+    <div class="badges">
+      <span class="badge">Difficulty: Easy</span>
+      <span class="badge">Pattern: Divide &amp; Conquer</span>
+      <span class="badge">Time: O(log n)</span>
+      <span class="badge">Space: O(1)</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2>The Problem</h2>
+      <p>
+        You are given a <b>sorted</b> array of distinct integers <code>arr</code> and a value <code>target</code>.
+        Return the index of <code>target</code> in the array, or <code>-1</code> if it is not there.
+      </p>
+      <pre>Input:  arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91], target = 23
+Output: 5    // arr[5] == 23
+
+Input:  arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91], target = 40
+Output: -1   // 40 is not present</pre>
+    </div>
+
+    <div class="card">
+      <h2>The Story</h2>
+      <p class="story">
+        Remember the number guessing game? A friend thinks of a number between 1 and 100 and you get to guess.
+        If you guess 1, then 2, then 3, you may need 100 tries.<br><br>
+        The clever player always guesses the <b>middle</b>. "Is it 50?" Your friend says "higher".
+        Now you know the answer is somewhere in 51 to 100, so you instantly ignored 50 numbers.
+        Next guess is the middle of that range: 75. "Lower." Another chunk gone.<br><br>
+        Every guess cuts the possibilities in half, so even 1,000,000 numbers need only about 20 guesses.
+        That is binary search. The only rule of the game: the numbers must be <b>in order</b>, otherwise
+        "higher" and "lower" mean nothing.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Real-Life Example</h2>
+      <p>
+        Think of finding a word in a <b>physical dictionary</b>. You never start at page 1. You open the book
+        around the middle, see you landed on words starting with "M", and since you want "S" you jump to the right half,
+        open the middle of that, and repeat. Phone contact lists, version-control tools hunting for the commit that
+        introduced a bug (<code>git bisect</code>), and database indexes all use the same halving trick.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Logic Flow Chart</h2>
+      <div class="flow-wrap">
+        <svg viewBox="0 0 720 700" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto;">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+            </marker>
+          </defs>
+          <style>
+            .box { fill:#0b1020; stroke:#38bdf8; stroke-width:2; }
+            .decision { fill:#1e1b3a; stroke:#a78bfa; stroke-width:2; }
+            .end { fill:#0b1020; stroke:#34d399; stroke-width:2; }
+            .lbl { fill:#e2e8f0; font-family:'Segoe UI', sans-serif; font-size:14px; text-anchor:middle; }
+            .small { fill:#94a3b8; font-size:12px; }
+            .edge { stroke:#38bdf8; stroke-width:2; fill:none; marker-end:url(#arrow); }
+            .plain { stroke:#38bdf8; stroke-width:2; fill:none; }
+          </style>
+
+          <!-- Start -->
+          <rect x="230" y="10" width="240" height="46" rx="12" class="box"/>
+          <text x="350" y="38" class="lbl">Start: arr (sorted), target</text>
+          <line x1="350" y1="56" x2="350" y2="86" class="edge"/>
+
+          <!-- Init -->
+          <rect x="230" y="86" width="240" height="46" rx="12" class="box"/>
+          <text x="350" y="114" class="lbl">low = 0, high = n - 1</text>
+          <line x1="350" y1="132" x2="350" y2="166" class="edge"/>
+
+          <!-- Decision 1 -->
+          <polygon points="350,166 490,215 350,264 210,215" class="decision"/>
+          <text x="350" y="220" class="lbl">low &lt;= high ?</text>
+          <line x1="490" y1="215" x2="558" y2="215" class="edge"/>
+          <text x="524" y="205" class="lbl small">No</text>
+          <rect x="560" y="190" width="130" height="50" rx="12" class="end"/>
+          <text x="625" y="220" class="lbl">Return -1</text>
+          <line x1="350" y1="264" x2="350" y2="300" class="edge"/>
+          <text x="368" y="286" class="lbl small">Yes</text>
+
+          <!-- Mid -->
+          <rect x="200" y="300" width="300" height="46" rx="12" class="box"/>
+          <text x="350" y="328" class="lbl">mid = low + (high - low) / 2</text>
+          <line x1="350" y1="346" x2="350" y2="380" class="edge"/>
+
+          <!-- Decision 2 -->
+          <polygon points="350,380 490,430 350,480 210,430" class="decision"/>
+          <text x="350" y="435" class="lbl">arr[mid] == target ?</text>
+          <line x1="490" y1="430" x2="558" y2="430" class="edge"/>
+          <text x="524" y="420" class="lbl small">Yes</text>
+          <rect x="560" y="405" width="130" height="50" rx="12" class="end"/>
+          <text x="625" y="435" class="lbl">Return mid</text>
+          <line x1="350" y1="480" x2="350" y2="515" class="edge"/>
+          <text x="368" y="502" class="lbl small">No</text>
+
+          <!-- Decision 3 -->
+          <polygon points="350,515 490,565 350,615 210,565" class="decision"/>
+          <text x="350" y="570" class="lbl">arr[mid] &lt; target ?</text>
+
+          <!-- Yes: go right -->
+          <line x1="210" y1="565" x2="192" y2="565" class="edge"/>
+          <text x="200" y="553" class="lbl small">Yes</text>
+          <rect x="45" y="540" width="145" height="50" rx="12" class="box"/>
+          <text x="117" y="570" class="lbl">low = mid + 1</text>
+
+          <!-- No: go left -->
+          <line x1="490" y1="565" x2="528" y2="565" class="edge"/>
+          <text x="510" y="553" class="lbl small">No</text>
+          <rect x="530" y="540" width="145" height="50" rx="12" class="box"/>
+          <text x="602" y="570" class="lbl">high = mid - 1</text>
+
+          <!-- Loop back -->
+          <line x1="117" y1="590" x2="117" y2="660" class="plain"/>
+          <line x1="602" y1="590" x2="602" y2="660" class="plain"/>
+          <line x1="602" y1="660" x2="15" y2="660" class="plain"/>
+          <line x1="15" y1="660" x2="15" y2="215" class="plain"/>
+          <line x1="15" y1="215" x2="208" y2="215" class="edge"/>
+          <text x="350" y="685" class="lbl small">Loop back and test the smaller search space</text>
+        </svg>
+      </div>
+      <p style="color:var(--muted); font-size:0.85rem; text-align:center;">
+        Each pass either finds the target or halves the range, so the loop ends after about log2(n) rounds.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Approaches Compared</h2>
+      <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+        <tr><td>Brute Force (linear scan)</td><td>O(n)</td><td>O(1)</td><td>Look at every element until the target shows up</td></tr>
+        <tr><td>Binary Search (iterative)</td><td>O(log n)</td><td>O(1)</td><td>Compare with the middle, discard the half that cannot contain the target</td></tr>
+        <tr><td>Binary Search (recursive)</td><td>O(log n)</td><td>O(log n)</td><td>Same idea, each halving is a recursive call</td></tr>
+      </table>
+      <div class="complexity" style="margin-top:16px;">
+        <div class="pill"><h3>Why it wins</h3><p>1,000,000 elements need at most about 20 comparisons instead of 1,000,000.</p></div>
+        <div class="pill"><h3>Watch out</h3><p>Needs sorted input. Use <code>low + (high - low) / 2</code> to avoid integer overflow.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Files In This Folder</h2>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>Solution.java</code></td><td>Java: linear, iterative and recursive binary search</td></tr>
+        <tr><td><code>Solution.py</code></td><td>Python: linear, iterative and recursive binary search</td></tr>
+        <tr><td><code>README.html</code></td><td>This explainer: story, real-life analogy, flowchart</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Daily DSA Challenge &middot; Day 14 &middot; Binary Search &middot; Generated 2026-10-20
+  </footer>
+
+</body>
+</html>

@@ -17,6 +17,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 | 11  | 2026-09-28 | Recursion | Tower of Hanoi | `Recursion/TowerOfHanoi` |
 | 12  | 2026-09-29 | Recursion | Generate All Subsets (Power Set) | `Recursion/GenerateAllSubsets` |
 | 13  | 2026-10-18 | Backtracking | Generate All Permutations | `Backtracking/GeneratePermutations` |
+| 14  | 2026-10-20 | Binary Search | Search in a Sorted Array | `BinarySearch/SearchInSortedArray` |
 
 ## Versioning
 
