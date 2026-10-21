@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 16 - Search in Rotated Sorted Array</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0d1117;color:#c9d1d9;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.7}
+.wrap{max-width:960px;margin:0 auto;padding:24px}
+.hero{background:linear-gradient(135deg,#1f2a5a,#3b1f5e 60%,#5a1f4a);border-radius:20px;padding:40px 32px;margin-bottom:28px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.hero h1{margin:0 0 8px;font-size:2.1rem;background:linear-gradient(90deg,#7ee8fa,#c471f5,#fa71cd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:0 0 18px;color:#aab4d4}
+.badge{display:inline-block;padding:5px 14px;border-radius:999px;font-size:.8rem;font-weight:600;margin:4px 6px 4px 0;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08)}
+.b-day{color:#7ee8fa}.b-diff{color:#ffd166}.b-pat{color:#c471f5}.b-time{color:#6ee7a0}.b-space{color:#fa71cd}
+.card{background:#161b22;border:1px solid #262c36;border-radius:16px;padding:26px;margin-bottom:24px}
+.card h2{margin-top:0;font-size:1.4rem;background:linear-gradient(90deg,#7ee8fa,#c471f5);-webkit-background-clip:text;background-clip:text;color:transparent}
+code,pre{background:#0d1117;border:1px solid #262c36;border-radius:8px;font-family:Consolas,Menlo,monospace;color:#7ee8fa}
+code{padding:2px 6px}pre{padding:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:12px;border-bottom:1px solid #262c36;text-align:left;vertical-align:top}
+th{color:#ffd166;background:#1c222b}
+.tip{border-left:4px solid #c471f5;background:#1c222b;padding:12px 16px;border-radius:0 10px 10px 0}
+svg{width:100%;height:auto;background:#0d1117;border-radius:12px;border:1px solid #262c36}
+footer{text-align:center;color:#6e7681;padding:20px;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+<h1>Search in Rotated Sorted Array</h1>
+<p>Binary Search, but the array has been spun like a wheel.</p>
+<span class="badge b-day">Day 16</span>
+<span class="badge b-diff">Medium</span>
+<span class="badge b-pat">Pattern: Modified Binary Search</span>
+<span class="badge b-time">Time: O(log n)</span>
+<span class="badge b-space">Space: O(1)</span>
+</div>
+
+<div class="card">
+<h2>The Problem</h2>
+<p>A sorted array of distinct integers was rotated at some unknown pivot. Given a <code>target</code>, return its index, or <code>-1</code> if it is absent. You must do it in O(log n).</p>
+<pre>Input : nums = [4, 5, 6, 7, 0, 1, 2], target = 0
+Output: 4
+
+Input : nums = [4, 5, 6, 7, 0, 1, 2], target = 3
+Output: -1</pre>
+</div>
+
+<div class="card">
+<h2>The Story</h2>
+<p>Imagine a library shelf with books numbered 0 to 7 in order. A prankster picks up the first four books and moves them to the end, so the shelf now reads 4 5 6 7 0 1 2. You are hunting for book 0 and you may only peek at one book at a time.</p>
+<p>You peek at the middle book: 7. Now compare it with the leftmost book, 4. Since 4 is smaller than 7, everything from the left end to the middle is still in perfect order. That is your sorted stretch. Is book 0 inside the range 4 to 7? No. So you throw away that whole stretch and search the other half. Next you peek at the middle of the remaining books, find 1, and repeat. Each peek halves the shelf, and the one fact you rely on is: <b>one side of the middle is always sorted</b>.</p>
+<div class="tip">Rule of thumb: find the sorted half, ask whether the target lives in it, keep the half that could hold the target, drop the other.</div>
+</div>
+
+<div class="card">
+<h2>Real-Life Example</h2>
+<p>A circular log buffer in a server, or a rotating shift schedule, stores timestamps in order but the start position drifts as old entries are overwritten. To find a given timestamp, the system does not scan every entry. It uses this exact trick: check which side of the midpoint is ordered, then narrow down. The same idea powers searches in ring buffers and in sorted data that has been wrapped around a start offset.</p>
+</div>
+
+<div class="card">
+<h2>Logic Flow Chart</h2>
+<svg viewBox="0 0 800 780" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif" font-size="14">
+<defs>
+<marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7ee8fa"/></marker>
+<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b4fa8"/><stop offset="1" stop-color="#6a2f9e"/></linearGradient>
+</defs>
+<g stroke="#7ee8fa" stroke-width="2" fill="none" marker-end="url(#ar)">
+<path d="M400,56 L400,90"/>
+<path d="M400,146 L400,180"/>
+<path d="M400,236 L400,270"/>
+<path d="M400,330 L400,364"/>
+<path d="M290,310 L150,310 L150,520"/>
+<path d="M510,420 L640,420 L640,520"/>
+<path d="M290,420 L150,420" stroke-dasharray="0"/>
+</g>
+<!-- start -->
+<rect x="310" y="10" width="180" height="46" rx="23" fill="#1f6f50" stroke="#6ee7a0"/>
+<text x="400" y="38" text-anchor="middle" fill="#fff">Start: lo=0, hi=n-1</text>
+<!-- while -->
+<rect x="290" y="90" width="220" height="56" rx="10" fill="url(#g1)" stroke="#c471f5"/>
+<text x="400" y="123" text-anchor="middle" fill="#fff">while lo &lt;= hi</text>
+<rect x="290" y="180" width="220" height="56" rx="10" fill="url(#g1)" stroke="#c471f5"/>
+<text x="400" y="213" text-anchor="middle" fill="#fff">mid = lo + (hi-lo)/2</text>
+<polygon points="400,270 510,300 400,330 290,300" fill="#5a3b0f" stroke="#ffd166"/>
+<text x="400" y="305" text-anchor="middle" fill="#fff">nums[mid]==target?</text>
+<text x="430" y="352" fill="#6ee7a0">No</text>
+<polygon points="400,364 510,420 400,476 290,420" fill="#5a3b0f" stroke="#ffd166"/>
+<text x="400" y="416" text-anchor="middle" fill="#fff">nums[lo] &lt;= nums[mid]?</text>
+<text x="400" y="434" text-anchor="middle" fill="#aab4d4" font-size="12">(left half sorted?)</text>
+<text x="250" y="296" fill="#6ee7a0">Yes</text>
+<text x="260" y="412" fill="#6ee7a0">No</text>
+<text x="520" y="412" fill="#6ee7a0">Yes</text>
+<!-- found -->
+<rect x="20" y="280" width="130" height="60" rx="30" fill="#1f6f50" stroke="#6ee7a0"/>
+<text x="85" y="315" text-anchor="middle" fill="#fff">return mid</text>
+<!-- right sorted branch -->
+<rect x="30" y="520" width="240" height="120" rx="10" fill="#161b22" stroke="#c471f5"/>
+<text x="150" y="548" text-anchor="middle" fill="#fff">Right half sorted</text>
+<text x="150" y="576" text-anchor="middle" fill="#aab4d4">if mid &lt; target &lt;= nums[hi]</text>
+<text x="150" y="600" text-anchor="middle" fill="#7ee8fa">lo = mid+1</text>
+<text x="150" y="624" text-anchor="middle" fill="#fa71cd">else hi = mid-1</text>
+<!-- left sorted branch -->
+<rect x="520" y="520" width="240" height="120" rx="10" fill="#161b22" stroke="#c471f5"/>
+<text x="640" y="548" text-anchor="middle" fill="#fff">Left half sorted</text>
+<text x="640" y="576" text-anchor="middle" fill="#aab4d4">if nums[lo] &lt;= target &lt; mid</text>
+<text x="640" y="600" text-anchor="middle" fill="#7ee8fa">hi = mid-1</text>
+<text x="640" y="624" text-anchor="middle" fill="#fa71cd">else lo = mid+1</text>
+<!-- loop back -->
+<g stroke="#7ee8fa" stroke-width="2" fill="none" marker-end="url(#ar)" stroke-dasharray="6 4">
+<path d="M150,640 L150,700 L400,700 L400,690"/>
+<path d="M640,640 L640,700 L400,700"/>
+</g>
+<rect x="290" y="650" width="220" height="40" rx="20" fill="#1c222b" stroke="#7ee8fa"/>
+<text x="400" y="675" text-anchor="middle" fill="#fff">repeat the loop</text>
+<rect x="290" y="720" width="220" height="46" rx="23" fill="#7a1f3a" stroke="#fa71cd"/>
+<text x="400" y="748" text-anchor="middle" fill="#fff">loop ends: return -1</text>
+</svg>
+</div>
+
+<div class="card">
+<h2>Approaches Compared</h2>
+<table>
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+<tr><td>Brute force</td><td>O(n)</td><td>O(1)</td><td>Scan every element until the target is found.</td></tr>
+<tr><td>Find pivot, then two binary searches</td><td>O(log n)</td><td>O(1)</td><td>Locate the rotation point, then search the correct sorted part.</td></tr>
+<tr><td>One-pass modified binary search</td><td>O(log n)</td><td>O(1)</td><td>Identify the sorted half each step and keep the half that can hold the target.</td></tr>
+</table>
+</div>
+
+<footer>Day 16 | Binary Search: Search in Rotated Sorted Array | 2026-10-21</footer>
+</div>
+</body>
+</html>
