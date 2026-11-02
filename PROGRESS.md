@@ -20,6 +20,7 @@ This file tracks every topic/question added by the automated daily DSA system, s
 | 14  | 2026-10-20 | Binary Search | Search in a Sorted Array | `BinarySearch/SearchInSortedArray` |
 | 15  | 2026-10-20 | Binary Search | First and Last Position of Element | `BinarySearch/FirstAndLastPosition` |
 | 16  | 2026-10-21 | Binary Search | Search in Rotated Sorted Array | `BinarySearch/SearchInRotatedSortedArray` |
+| 17  | 2026-11-02 | Binary Search | Find Peak Element | `BinarySearch/FindPeakElement` |
 
 ## Versioning
 
