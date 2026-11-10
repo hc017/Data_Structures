@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 18 - Merge Sort</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0f1a;color:#d6dbe8;font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7;padding:24px}
+.wrap{max-width:900px;margin:0 auto}
+.hero{background:linear-gradient(135deg,#1b2447,#3a1d5c);border-radius:20px;padding:40px 32px;margin-bottom:28px;border:1px solid #2c3566}
+.hero h1{font-size:2.4rem;background:linear-gradient(90deg,#6ee7ff,#c084fc,#fb7185);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:#a5b0d0;margin-top:6px}
+.badges{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}
+.badge{padding:6px 14px;border-radius:999px;font-size:.85rem;font-weight:600;background:#141a33;border:1px solid #3b4685;color:#9fb4ff}
+.badge.g{color:#6ee7b7;border-color:#1f6f55}.badge.y{color:#fcd34d;border-color:#7a5d12}.badge.p{color:#e0a8ff;border-color:#6b2f93}
+.card{background:#121830;border:1px solid #232b52;border-radius:16px;padding:26px;margin-bottom:22px}
+.card h2{font-size:1.4rem;margin-bottom:12px;background:linear-gradient(90deg,#6ee7ff,#c084fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+code,pre{background:#0a0e1d;border:1px solid #2a335f;border-radius:8px;color:#8be9fd;font-family:Consolas,monospace}
+code{padding:2px 6px}pre{padding:14px;overflow-x:auto;margin:10px 0}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:12px;border-bottom:1px solid #232b52;text-align:left}
+th{color:#c084fc}
+svg{width:100%;height:auto;background:#0a0e1d;border-radius:12px;border:1px solid #2a335f}
+footer{text-align:center;color:#6b7699;font-size:.9rem;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+<h1>Merge Sort</h1>
+<p>Divide the mess, sort the pieces, stitch them back together.</p>
+<div class="badges">
+<span class="badge">Day 18</span>
+<span class="badge">Topic: Sorting</span>
+<span class="badge y">Difficulty: Medium</span>
+<span class="badge p">Pattern: Divide and Conquer</span>
+<span class="badge g">Time: O(n log n)</span>
+<span class="badge g">Space: O(n)</span>
+</div>
+</div>
+
+<div class="card">
+<h2>The Problem</h2>
+<p>Given an array of integers, sort it in ascending order in <code>O(n log n)</code> time.</p>
+<pre>Input : [38, 27, 43, 3, 9, 82, 10]
+Output: [3, 9, 10, 27, 38, 43, 82]</pre>
+</div>
+
+<div class="card">
+<h2>The Story</h2>
+<p>Imagine a teacher with 100 unsorted exam papers. Sorting all 100 at once is exhausting. So she splits the pile in half and hands each half to an assistant. Each assistant splits again and hands it on, until every person holds a single paper. One paper is already sorted, nothing to do.</p>
+<p>Now the magic: two people each holding a sorted pile combine them. They look at the top paper of each pile, take the smaller one, and place it on the new pile. Repeat until both piles are empty. Merged piles get merged again, all the way back up, and the teacher ends with one perfectly sorted stack.</p>
+</div>
+
+<div class="card">
+<h2>Real-Life Example</h2>
+<p>Two supermarket queues, each already sorted by token number, are merged into a single counter line. The cashier simply compares the front of both queues and calls the smaller token. Databases do the same thing when sorting huge files: they sort chunks that fit in memory, then merge the sorted chunks (external merge sort).</p>
+</div>
+
+<div class="card">
+<h2>Logic Flow Chart</h2>
+<svg viewBox="0 0 760 640" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,sans-serif" font-size="14">
+<defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9fb4ff"/></marker></defs>
+<g stroke="#9fb4ff" stroke-width="2" fill="none" marker-end="url(#ar)">
+<line x1="380" y1="50" x2="380" y2="90"/>
+<line x1="380" y1="170" x2="380" y2="210"/>
+<line x1="380" y1="260" x2="380" y2="300"/>
+<line x1="380" y1="350" x2="380" y2="390"/>
+<line x1="380" y1="440" x2="380" y2="480"/>
+<line x1="380" y1="530" x2="380" y2="570"/>
+<path d="M500 130 L640 130 L640 580 L500 595"/>
+</g>
+<rect x="300" y="10" width="160" height="40" rx="20" fill="#1f6f55" stroke="#6ee7b7" stroke-width="2"/>
+<text x="380" y="35" fill="#fff" text-anchor="middle">Start: mergeSort(arr)</text>
+<polygon points="380,90 500,130 380,170 260,130" fill="#3a1d5c" stroke="#c084fc" stroke-width="2"/>
+<text x="380" y="135" fill="#fff" text-anchor="middle">size &lt;= 1 ?</text>
+<text x="398" y="195" fill="#fcd34d">No</text>
+<text x="545" y="120" fill="#fcd34d">Yes</text>
+<rect x="280" y="210" width="200" height="50" rx="10" fill="#1b2447" stroke="#6ee7ff" stroke-width="2"/>
+<text x="380" y="240" fill="#fff" text-anchor="middle">Find mid, split in two</text>
+<rect x="280" y="300" width="200" height="50" rx="10" fill="#1b2447" stroke="#6ee7ff" stroke-width="2"/>
+<text x="380" y="330" fill="#fff" text-anchor="middle">mergeSort(left half)</text>
+<rect x="280" y="390" width="200" height="50" rx="10" fill="#1b2447" stroke="#6ee7ff" stroke-width="2"/>
+<text x="380" y="420" fill="#fff" text-anchor="middle">mergeSort(right half)</text>
+<rect x="250" y="480" width="260" height="50" rx="10" fill="#3a1d5c" stroke="#fb7185" stroke-width="2"/>
+<text x="380" y="503" fill="#fff" text-anchor="middle">Merge: compare fronts,</text>
+<text x="380" y="521" fill="#fff" text-anchor="middle">take smaller each time</text>
+<rect x="300" y="570" width="200" height="40" rx="20" fill="#1f6f55" stroke="#6ee7b7" stroke-width="2"/>
+<text x="400" y="595" fill="#fff" text-anchor="middle">Return sorted array</text>
+</svg>
+</div>
+
+<div class="card">
+<h2>Approaches Compared</h2>
+<table>
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Idea</th></tr>
+<tr><td>Brute force (Bubble Sort)</td><td>O(n^2)</td><td>O(1)</td><td>Repeatedly swap adjacent out-of-order items.</td></tr>
+<tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n)</td><td>Split in halves, sort each, merge sorted halves. Stable.</td></tr>
+</table>
+</div>
+
+<footer>Day 18 | Sorting: Merge Sort | 2026-11-10</footer>
+</div>
+</body>
+</html>
